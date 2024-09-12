@@ -1,6 +1,6 @@
 ﻿namespace MTCG.Server.Util.Enums;
 
-public enum Species
+public enum Race
 {
     GOBLIN,
     DRAGON,

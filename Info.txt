@@ -1,0 +1,13 @@
+Es kann erweitert werden (z.B. mehr elemente, typen, rassen, etc)
+	- Klassen von Karten (-> Legendary, Epic, ...) -> dementsprechend auch verschieden teure Packages
+
+User schickt request an den server -> ich möchte kämpfen, diese 4 karten
+	- server wartet auf einen zweiten spieler
+
+Enpoints:
+	- Register
+	- Login
+	- Battle
+	- Cards (karten kaufen)
+	- Scoreboard
+	- Trading
