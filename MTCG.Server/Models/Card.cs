@@ -14,8 +14,12 @@ public abstract class Card
 
     private int _damage { get; set; }
 
-    protected Card()
+    protected Card(CardType type, Element cardElement, Rarity rarity, string name, int damage)
     {
-
+		 _type = type;
+		 _element = cardElement;
+		 _rarity = rarity;
+		 _name = name;
+		 _damage = damage;
     }
 }

@@ -8,7 +8,7 @@ public class Helper
         return "";
     }
 
-    public static bool PasswordIsValid(string password, string userHash)
+    public static bool ValidUserCredentials(string password, string userName)
     {
         // TODO:
         return true;

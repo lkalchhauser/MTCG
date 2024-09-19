@@ -12,7 +12,9 @@ public class User
 
     private Stats _stats { get; set; }
 
-    public string Password
+	 private string _token { get; set; }
+
+	public string Password
     {
         get => _passwordHash;
         set => _passwordHash = value;
@@ -24,6 +26,7 @@ public class User
         this._username = username;
         this._passwordHash = Helper.HashPassword(password);
         _stats = new Stats();
+        _coins = 100;
     }
 
     public void SetNewPassword(string newPassword)
