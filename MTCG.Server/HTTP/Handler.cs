@@ -7,6 +7,7 @@ namespace MTCG.Server.HTTP;
 
 public class Handler
 {
+	public TcpClient Client { get; private set; }
 	public virtual string PlainMessage { get; set; }
 
 	public virtual string Method { get; set; }
@@ -21,6 +22,7 @@ public class Handler
 
 	public void Handle(TcpClient client)
 	{
+		Client = client;
 		var buffer = new byte[1024];
 		var data = "";
 
@@ -64,5 +66,24 @@ public class Handler
 		}
 
 		Console.WriteLine(data);
+	}
+
+	public void Reply(int statusCode, string? payload = null, string? value = null)
+	{
+		StatusCode = statusCode;
+
+		string response;
+		response = "HTTP/1.1 200 OK}\n";
+
+		if (string.IsNullOrEmpty(payload))
+		{
+			response += "Content-Length: 0\n";
+		}
+		response += "Content-Type: text/plain\n\n";
+
+		byte[] tempBuf = Encoding.ASCII.GetBytes(response);
+		Client.GetStream().Write(tempBuf, 0, tempBuf.Length);
+		Client.GetStream().Close();
+		Client.Dispose();
 	}
 }

@@ -26,7 +26,14 @@ public class Server
 			Task.Run(() =>
 			{
 				_handler.Handle(client);
+				HandleIncoming();
 			});
 		}
+	}
+
+	public void HandleIncoming()
+	{
+		Console.WriteLine(_handler.Path);
+		_handler.Reply(200);
 	}
 }
