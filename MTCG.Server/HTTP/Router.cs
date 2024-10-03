@@ -9,35 +9,59 @@ public class Router
 	{
 		Console.WriteLine(handler.Method);
 
-		if (handler.Method == "GET")
+		switch (handler.Method)
 		{
-			// users/username
-			// cards
-			// deck
-			// stats
-			// scoreboard
-			// tradings
-
-		}
-		else if (handler.Method == "POST")
-		{
-			// users
-			// sessions
-			// packages
-			// transactions/packages
-			// battles
-			// tradings
-			// tradings/{tradingdealid}
-
-		}
-		else if (handler.Method == "PUT")
-		{
-			// users/username
-			// deck
-		}
-		else if (handler.Method == "DELETE")
-		{
-			// tradings/{tradingdealid}
+			case "GET":
+				switch(handler.Path)
+				{
+					case "/":
+						handler.Reply(200, "Welcome to the Monster Trading Card Game Server!");
+						break;
+					case "/users/username": // TODO: change to include
+						// return user with username
+						break;
+					case "/cards":
+						// return all cards
+						break;
+					case "/deck":
+						// return deck of user
+						break;
+					case "/stats":
+						// return stats of user
+						break;
+					case "/scoreboard":
+						// return scoreboard
+						break;
+					case "/tradings":
+						// return all tradings
+						break;
+					default:
+						handler.Reply(404);
+						break;
+				}
+				// users/username
+				// cards
+				// deck
+				// stats
+				// scoreboard
+				// tradings
+				break;
+			case "POST":
+				// users
+				// sessions
+				// packages
+				// transactions/packages
+				// battles
+				// tradings
+				// tradings/{tradingdealid}
+				break;
+			case "PUT":
+				// users/username
+				// deck
+				break;
+			case "DELETE":
+				// tradings/{tradingdealid}
+				break;
 		}
 
 		handler.Reply(200);

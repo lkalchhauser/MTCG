@@ -29,11 +29,13 @@ public class User
         _coins = 100;
     }
 
+	 //TODO: move to service
     public void SetNewPassword(string newPassword)
     {
         this._passwordHash = Helper.HashPassword(newPassword);
     }
 
+	 // TODO: move to service
     public void ShowUser()
     {
         Console.WriteLine($"This user is {_username}");

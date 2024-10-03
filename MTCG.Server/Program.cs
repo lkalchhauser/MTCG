@@ -4,8 +4,8 @@
     {
         public static void Main(string[] args)
         {
-            var Server = new HTTP.Server("http://localhost:8888");
-				Server.Start();
+            var server = new HTTP.Server("http://localhost:8888");
+            server.Start();
 			}
     }
 }

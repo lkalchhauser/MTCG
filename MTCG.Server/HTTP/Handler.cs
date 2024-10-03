@@ -68,10 +68,11 @@ public class Handler
 		Console.WriteLine(data);
 	}
 
-	public void Reply(int statusCode, string? payload = null, string? value = null)
+	public void Reply(int statusCode = 200, string? payload = null, string? value = null)
 	{
 		StatusCode = statusCode;
 
+		// TODO: change so it isn't automatically 200 OK
 		string response;
 		response = "HTTP/1.1 200 OK}\n";
 
