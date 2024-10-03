@@ -25,7 +25,6 @@ public class Handler
 		Client = client;
 		var buffer = new byte[1024];
 		var data = "";
-
 		var stream = client.GetStream();
 		while (stream.DataAvailable || data == "")
 		{
@@ -59,6 +58,7 @@ public class Handler
 			}
 			else
 			{
+				// is this the correct way - without content-length?
 				Payload += requestLines[i] + "\r\n";
 			}
 
@@ -68,6 +68,7 @@ public class Handler
 		Console.WriteLine(data);
 	}
 
+	// maybe rename payload to "Body"?
 	public void Reply(int statusCode = 200, string? payload = null, string? value = null)
 	{
 		StatusCode = statusCode;
@@ -81,7 +82,6 @@ public class Handler
 			response += "Content-Length: 0\n";
 		}
 		response += "Content-Type: text/plain\n\n";
-
 		byte[] tempBuf = Encoding.ASCII.GetBytes(response);
 		Client.GetStream().Write(tempBuf, 0, tempBuf.Length);
 		Client.GetStream().Close();
