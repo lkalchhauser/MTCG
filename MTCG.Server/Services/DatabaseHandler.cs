@@ -1,5 +1,6 @@
 ﻿using MTCG.Server.Config;
 using MTCG.Server.Models;
+using MTCG.Server.Util;
 using Npgsql;
 
 namespace MTCG.Server.Services;
@@ -49,8 +50,8 @@ public class DatabaseHandler
 		return true;
 	}
 
-	public bool RegisterUser(UserCredentials credentials)
+	public string RegisterUser(UserCredentials credentials)
 	{
-		return true;
+		return Helper.GenerateToken(credentials.Username);
 	}
 }

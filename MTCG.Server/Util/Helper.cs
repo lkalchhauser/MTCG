@@ -13,4 +13,10 @@ public class Helper
         // TODO:
         return true;
     }
+
+	 public static string GenerateToken(string username)
+	{
+		//TODO make this better (for test script it has to stay like this)
+		return $"{username}-mtcgToken";
+	}
 }
