@@ -1,10 +1,17 @@
 ﻿using System.Net.Sockets;
 using System.Reflection.Metadata;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using MTCG.Server.Models;
+using MTCG.Server.Services;
 
 namespace MTCG.Server.HTTP;
 
 public class Router
 {
+	private readonly DatabaseHandler _dbHandler = DatabaseHandler.Instance;
+
 	public void HandleIncoming(Handler handler)
 	{
 		Console.WriteLine(handler.Method);
@@ -47,6 +54,35 @@ public class Router
 				// tradings
 				break;
 			case "POST":
+				switch (handler.Path)
+				{
+					case "/users":
+						if (handler.GetContentType() == "application/json" && handler.Payload != null)
+						{
+							var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
+							var token = _dbHandler.RegisterUser(credentials);
+						}
+						//var token = _dbHandler.RegisterUser();
+						break;
+					case "/sessions":
+						// create new session
+						break;
+					case "/packages":
+						// create new package
+						break;
+					case "/transactions/packages":
+						// create new transaction
+						break;
+					case "/battles":
+						// create new battle
+						break;
+					case "/tradings":
+						// create new trading
+						break;
+					default:
+						handler.Reply(404);
+						break;
+				}
 				// users
 				// sessions
 				// packages

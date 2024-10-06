@@ -1,4 +1,7 @@
-﻿namespace MTCG.Server
+﻿using MTCG.Server.Config;
+using Npgsql;
+
+namespace MTCG.Server
 {
     class Program
     {
@@ -6,6 +9,7 @@
         {
             var server = new HTTP.Server("http://localhost:8888");
             server.Start();
-			}
+
+		}
     }
 }

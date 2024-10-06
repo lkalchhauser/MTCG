@@ -16,7 +16,7 @@ public class Handler
 
 	public HttpHeader[] Headers { get; set; }
 
-	public string Payload { get; set; }
+	public string? Payload { get; set; }
 
 	public int StatusCode { get; set; }
 
@@ -86,5 +86,18 @@ public class Handler
 		Client.GetStream().Write(tempBuf, 0, tempBuf.Length);
 		Client.GetStream().Close();
 		Client.Dispose();
+	}
+
+	public string GetContentType()
+	{
+		foreach (var httpHeader in Headers)
+		{
+			if (httpHeader.Name == "Content-Type")
+			{
+				return httpHeader.Value;
+			}
+		}
+
+		return "";
 	}
 }
