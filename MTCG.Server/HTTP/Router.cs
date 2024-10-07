@@ -11,6 +11,7 @@ namespace MTCG.Server.HTTP;
 public class Router
 {
 	private readonly DatabaseHandler _dbHandler = DatabaseHandler.Instance;
+	private UserManager _userManager = new UserManager();
 
 	public void HandleIncoming(Handler handler)
 	{
@@ -57,15 +58,13 @@ public class Router
 				switch (handler.Path)
 				{
 					case "/users":
-						if (handler.GetContentType() == "application/json" && handler.Payload != null)
-						{
-							var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
-							var token = _dbHandler.RegisterUser(credentials);
-						}
-						//var token = _dbHandler.RegisterUser();
+						// TODO: handle user already registered so that it returns more than an error code
+						var userRegister = _userManager.RegisterUser(handler);
+						handler.Reply(userRegister ? 400 : 201);
 						break;
 					case "/sessions":
-						// create new session
+						var userToken = _userManager.LoginUser(handler);
+						handler.Reply(userToken == "" ? 400 : 200, userToken);
 						break;
 					case "/packages":
 						// create new package

@@ -81,6 +81,7 @@ public class Handler
 		{
 			response += "Content-Length: 0\n";
 		}
+		// TODO: maybe change this to enum/switch so we can have different content types
 		response += "Content-Type: text/plain\n\n";
 		byte[] tempBuf = Encoding.ASCII.GetBytes(response);
 		Client.GetStream().Write(tempBuf, 0, tempBuf.Length);

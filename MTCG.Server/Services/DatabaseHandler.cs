@@ -50,8 +50,14 @@ public class DatabaseHandler
 		return true;
 	}
 
-	public string RegisterUser(UserCredentials credentials)
+	public bool RegisterUser(UserCredentials credentials)
 	{
-		return Helper.GenerateToken(credentials.Username);
+		return true;
+	}
+
+	public string LoginUser(UserCredentials credentials)
+	{
+		var token = Helper.GenerateToken(credentials.Username);
+		return token;
 	}
 }
