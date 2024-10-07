@@ -31,7 +31,7 @@ public class DatabaseHandler
 	{
 		try
 		{
-			_connection = new NpgsqlConnection(new Credentials().GetConnectionString());
+			_connection = new NpgsqlConnection(new DatabaseCredentials().GetConnectionString());
 			_connection.Open();
 			Console.WriteLine("Database connection established!");
 			return true;
@@ -51,6 +51,11 @@ public class DatabaseHandler
 	}
 
 	public bool RegisterUser(UserCredentials credentials)
+	{
+		return true;
+	}
+
+	public bool DoesUserExist(string username)
 	{
 		return true;
 	}

@@ -13,8 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Config\" />
-    <Folder Include="Util\HelperClasses\" />
   </ItemGroup>
 
 </Project>

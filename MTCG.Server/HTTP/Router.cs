@@ -58,9 +58,9 @@ public class Router
 				switch (handler.Path)
 				{
 					case "/users":
-						// TODO: handle user already registered so that it returns more than an error code
 						var userRegister = _userManager.RegisterUser(handler);
-						handler.Reply(userRegister ? 400 : 201);
+
+						handler.Reply(userRegister.Success ? 200 : 400, userRegister.Message);
 						break;
 					case "/sessions":
 						var userToken = _userManager.LoginUser(handler);
