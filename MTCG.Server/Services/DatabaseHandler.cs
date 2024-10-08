@@ -52,17 +52,38 @@ public class DatabaseHandler
 
 	public bool RegisterUser(UserCredentials credentials)
 	{
+		var command = new NpgsqlCommand($"insert into users (username, password) values ('{credentials.Username}', '{credentials.Password}')", _connection);
+		command.ExecuteNonQuery();
 		return true;
 	}
 
 	public bool DoesUserExist(string username)
 	{
-		return true;
+		var command = new NpgsqlCommand($"select * from users where username = '{username}'", _connection);
+		var reader = command.ExecuteReader();
+		var hasRows = reader.HasRows;
+		reader.Close();
+		return hasRows;
 	}
 
 	public string LoginUser(UserCredentials credentials)
 	{
-		var token = Helper.GenerateToken(credentials.Username);
-		return token;
+		// TODO: maybe change this to use npgsql parameters
+		var command = new NpgsqlCommand($"select password from users where username = '{credentials.Username}'", _connection);
+		var reader = command.ExecuteReader();
+
+		if (!reader.HasRows)
+		{
+			reader.Close();
+			return string.Empty;
+		}
+
+		reader.Read();
+		var pwHash = (string)reader[0];
+		reader.Close();
+
+		var passwordIsValid = Helper.VerifyPassword(credentials.Password, pwHash);
+
+		return !passwordIsValid ? string.Empty : Helper.GenerateToken(credentials.Username);
 	}
 }

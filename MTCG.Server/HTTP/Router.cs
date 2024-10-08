@@ -13,6 +13,11 @@ public class Router
 	private readonly DatabaseHandler _dbHandler = DatabaseHandler.Instance;
 	private UserManager _userManager = new UserManager();
 
+	public Router()
+	{
+		_dbHandler.SetupDbConnection();
+	}
+
 	public void HandleIncoming(Handler handler)
 	{
 		Console.WriteLine(handler.Method);
@@ -58,13 +63,13 @@ public class Router
 				switch (handler.Path)
 				{
 					case "/users":
-						var userRegister = _userManager.RegisterUser(handler);
+						var userRegisterResult = _userManager.RegisterUser(handler, _dbHandler);
 
-						handler.Reply(userRegister.Success ? 200 : 400, userRegister.Message);
+						handler.Reply(userRegisterResult.Success ? 201 : 400, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
-						var userToken = _userManager.LoginUser(handler);
-						handler.Reply(userToken == "" ? 400 : 200, userToken);
+						var userLoginResult = _userManager.LoginUser(handler, _dbHandler);
+						handler.Reply(userLoginResult.Success ? 200 : 400, userLoginResult.Message, userLoginResult.ContentType);
 						break;
 					case "/packages":
 						// create new package
@@ -98,7 +103,5 @@ public class Router
 				// tradings/{tradingdealid}
 				break;
 		}
-
-		handler.Reply(200);
 	}
 }

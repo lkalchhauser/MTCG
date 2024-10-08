@@ -11,7 +11,8 @@ public class DbUtil
 		connection.Open();
 		var command = new NpgsqlCommand("drop table if exists users cascade", connection);
 		command.ExecuteNonQuery();
-		var command2 = new NpgsqlCommand("create table users (id serial primary key, username varchar(255) not null, password varchar(255) not null, token varchar(255) not null)", connection);
+		var command2 = new NpgsqlCommand("create table users (id serial primary key, username varchar not null, password varchar not null, token varchar)", connection);
 		command2.ExecuteNonQuery();
+		connection.Close();
 	}
 }

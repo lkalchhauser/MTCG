@@ -1,7 +1,10 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
+using MTCG.Server.Util;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MTCG.Server.HTTP;
 
@@ -64,27 +67,28 @@ public class Handler
 
 			Headers = headers.ToArray();
 		}
-
-		Console.WriteLine(data);
 	}
 
 	// maybe rename payload to "Body"?
-	public void Reply(int statusCode = 200, string? payload = null, string? value = null)
+	public void Reply(int statusCode = 200, string? payload = null, string? contentType = Helper.TEXT_PLAIN)
 	{
 		StatusCode = statusCode;
 
-		// TODO: change so it isn't automatically 200 OK
-		string response;
-		response = "HTTP/1.1 200 OK}\n";
-
+		var response = $"HTTP/1.1 {statusCode} {Helper.HTTP_CODES[statusCode]}\n";
 		if (string.IsNullOrEmpty(payload))
 		{
 			response += "Content-Length: 0\n";
 		}
-		// TODO: maybe change this to enum/switch so we can have different content types
-		response += "Content-Type: text/plain\n\n";
-		byte[] tempBuf = Encoding.ASCII.GetBytes(response);
-		Client.GetStream().Write(tempBuf, 0, tempBuf.Length);
+		// TODO: add a modifieably content type
+		response += $"Content-Type: {contentType}\n\n";
+
+		if (payload != null)
+		{
+			response += payload;
+		}
+
+		var tmpBuf = Encoding.ASCII.GetBytes(response);
+		Client.GetStream().Write(tmpBuf, 0, tmpBuf.Length);
 		Client.GetStream().Close();
 		Client.Dispose();
 	}

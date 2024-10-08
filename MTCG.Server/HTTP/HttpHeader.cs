@@ -17,9 +17,9 @@ public class HttpHeader
 		Name = Value = "";
 		try
 		{
-			int n = header.IndexOf(':');
-			Name = header.Substring(0, n).Trim();
-			Value = header.Substring(n + 1).Trim();
+			var n = header.IndexOf(':');
+			Name = header[..n].Trim();
+			Value = header[(n + 1)..].Trim();
 		}
 		catch
 		{
