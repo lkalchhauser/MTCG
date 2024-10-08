@@ -10,6 +10,7 @@ namespace MTCG.Server.HTTP;
 
 public class Handler
 {
+	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	public TcpClient Client { get; private set; }
 	public virtual string PlainMessage { get; set; }
 
@@ -25,6 +26,7 @@ public class Handler
 
 	public void Handle(TcpClient client)
 	{
+		_logger.Debug("Handling request");
 		Client = client;
 		var buffer = new byte[1024];
 		var data = "";
@@ -70,22 +72,25 @@ public class Handler
 	}
 
 	// maybe rename payload to "Body"?
-	public void Reply(int statusCode = 200, string? payload = null, string? contentType = Helper.TEXT_PLAIN)
+	public void Reply(int statusCode = 200, string? body = null, string? contentType = Helper.TEXT_PLAIN)
 	{
+		_logger.Debug("Replying to request");
 		StatusCode = statusCode;
 
 		var response = $"HTTP/1.1 {statusCode} {Helper.HTTP_CODES[statusCode]}\n";
-		if (string.IsNullOrEmpty(payload))
+		if (string.IsNullOrEmpty(body))
 		{
 			response += "Content-Length: 0\n";
 		}
-		// TODO: add a modifieably content type
+
 		response += $"Content-Type: {contentType}\n\n";
 
-		if (payload != null)
+		if (body != null)
 		{
-			response += payload;
+			response += body;
 		}
+
+		_logger.Debug($"Sending response: {response}");
 
 		var tmpBuf = Encoding.ASCII.GetBytes(response);
 		Client.GetStream().Write(tmpBuf, 0, tmpBuf.Length);
@@ -102,7 +107,6 @@ public class Handler
 				return httpHeader.Value;
 			}
 		}
-
 		return "";
 	}
 }

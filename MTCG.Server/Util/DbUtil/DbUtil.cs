@@ -5,8 +5,10 @@ namespace MTCG.Server.Util.DbUtil;
 
 public class DbUtil
 {
+	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	public void SetupDatabase()
 	{
+		_logger.Debug("Setting up Database...");
 		var connection = new NpgsqlConnection(new DatabaseCredentials().GetConnectionString());
 		connection.Open();
 		var command = new NpgsqlCommand("drop table if exists users cascade", connection);

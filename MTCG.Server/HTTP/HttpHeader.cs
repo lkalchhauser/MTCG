@@ -2,6 +2,7 @@
 
 public class HttpHeader
 {
+	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	public string Name { get; private set; }
 
 	public string Value { get; private set; }
@@ -23,7 +24,8 @@ public class HttpHeader
 		}
 		catch
 		{
-			Console.WriteLine("Invalid header format");
+			// TODO: what do?
+			_logger.Error("Invalid header format!");
 		}
 	}
 }

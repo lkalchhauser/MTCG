@@ -5,6 +5,8 @@ namespace MTCG.Server.HTTP;
 
 public class Server
 {
+	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 	private TcpListener _tcpListener;
 
 	private Router _router;
@@ -13,7 +15,8 @@ public class Server
 
 	public Server(string uri)
 	{
-		_tcpListener = new TcpListener(IPAddress.Any, 8888);
+		var url = new Uri(uri);
+		_tcpListener = new TcpListener(IPAddress.Any, url.Port);
 		_router = new Router();
 		_running = true;
 	}
@@ -24,10 +27,11 @@ public class Server
 
 		while (_running)
 		{
-			Console.WriteLine("Waiting for a connection...");
+			_logger.Info("Waiting for a connection..");
 			var client = _tcpListener.AcceptTcpClient();
 			var handler = new Handler();
 			handler.Handle(client);
+			_logger.Debug($"Recieved new request: \"{handler.PlainMessage}\"");
 			_router.HandleIncoming(handler);
 		}
 	}

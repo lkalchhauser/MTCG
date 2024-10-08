@@ -10,6 +10,7 @@ namespace MTCG.Server.HTTP;
 
 public class Router
 {
+	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	private readonly DatabaseHandler _dbHandler = DatabaseHandler.Instance;
 	private UserManager _userManager = new UserManager();
 
@@ -20,14 +21,13 @@ public class Router
 
 	public void HandleIncoming(Handler handler)
 	{
-		Console.WriteLine(handler.Method);
-
 		switch (handler.Method)
 		{
 			case "GET":
 				switch(handler.Path)
 				{
 					case "/":
+						_logger.Debug("Routing GET /");
 						handler.Reply(200, "Welcome to the Monster Trading Card Game Server!");
 						break;
 					case "/users/username": // TODO: change to include
@@ -63,11 +63,12 @@ public class Router
 				switch (handler.Path)
 				{
 					case "/users":
+						_logger.Debug("Routing POST /user");
 						var userRegisterResult = _userManager.RegisterUser(handler, _dbHandler);
-
 						handler.Reply(userRegisterResult.Success ? 201 : 400, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
+						_logger.Debug("Routing POST /sessions");
 						var userLoginResult = _userManager.LoginUser(handler, _dbHandler);
 						handler.Reply(userLoginResult.Success ? 200 : 400, userLoginResult.Message, userLoginResult.ContentType);
 						break;
