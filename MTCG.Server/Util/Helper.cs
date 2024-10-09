@@ -9,7 +9,6 @@ public class Helper
 	{
 		_logger.Debug("Hashing password");
 		var hash = BCrypt.HashPassword(password);
-		var isValid = BCrypt.Verify(password, hash);
 		return hash;
 	}
 
