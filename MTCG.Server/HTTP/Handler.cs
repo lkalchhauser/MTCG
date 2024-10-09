@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using MTCG.Server.Util;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MTCG.Server.HTTP;
 
@@ -71,7 +70,6 @@ public class Handler
 		}
 	}
 
-	// maybe rename payload to "Body"?
 	public void Reply(int statusCode = 200, string? body = null, string? contentType = Helper.TEXT_PLAIN)
 	{
 		_logger.Debug("Replying to request");

@@ -13,10 +13,13 @@ public class Server
 
 	private bool _running;
 
-	public Server(string uri)
+	private Uri _uri;
+
+	public Server(string url)
 	{
-		var url = new Uri(uri);
-		_tcpListener = new TcpListener(IPAddress.Any, url.Port);
+		var uri = new Uri(url);
+		_uri = uri;
+		_tcpListener = new TcpListener(IPAddress.Any, uri.Port);
 		_router = new Router();
 		_running = true;
 	}
@@ -24,9 +27,11 @@ public class Server
 	public void Start()
 	{
 		_tcpListener.Start();
+		_logger.Info($"Server started on \"{_uri}\"");
 
 		while (_running)
 		{
+			// TODO: add tasking/asynchronous handling
 			_logger.Info("Waiting for a connection..");
 			var client = _tcpListener.AcceptTcpClient();
 			var handler = new Handler();
