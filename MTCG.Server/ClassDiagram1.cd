@@ -1,112 +1,182 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="MTCG.Server.Models.Card">
-    <Position X="8.5" Y="0.5" Width="1.5" />
+  <Class Name="MTCG.Server.Util.HelperClasses.Result" Collapsed="true">
+    <Position X="10.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAIABABAAAAAQAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAQIAABAAA=</HashCode>
+      <FileName>Util\HelperClasses\Result.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Util.DbUtil.DbUtil" Collapsed="true">
+    <Position X="10.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Util\DbUtil\DbUtil.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Util.Helper" Collapsed="true">
+    <Position X="14" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAEAAgAAAACAAAAIAAAABAAAAAAAAgAAAA=</HashCode>
+      <FileName>Util\Helper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Util.SpecialtyHandler" Collapsed="true">
+    <Position X="8.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Util\SpecialtyHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.HTTP.Handler" Collapsed="true">
+    <Position X="12.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQIBAAAwAAAAKAAAAAIAIAIAAAAAAAQ=</HashCode>
+      <FileName>HTTP\Handler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.HTTP.HttpHeader" Collapsed="true">
+    <Position X="8.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAIAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>HTTP\HttpHeader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.HTTP.Router" Collapsed="true">
+    <Position X="12.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAABAAAAAAAAAAAAAAAAAAAIAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>HTTP\Router.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.HTTP.Server" Collapsed="true">
+    <Position X="14" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgACAAEAAAAAAAAAAAICAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>HTTP\Server.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Services.DatabaseHandler" Collapsed="true">
+    <Position X="8.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAGAAAAAAAAAAAgAAAAAAAAIAAAAAAEQAAAEAAABAE=</HashCode>
+      <FileName>Services\DatabaseHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Services.UserManager" Collapsed="true">
+    <Position X="10.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Services\UserManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Server.Models.Card" Collapsed="true">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAABAAAAAQAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Server.Models.Deck">
-    <Position X="12" Y="0.75" Width="1.5" />
+  <Class Name="MTCG.Server.Models.Deck" Collapsed="true">
+    <Position X="17" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Deck.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Server.Models.MonsterCard">
-    <Position X="10.25" Y="2.25" Width="1.5" />
+  <Class Name="MTCG.Server.Models.MonsterCard" Collapsed="true">
+    <Position X="15.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Models\MonsterCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Server.Models.Package" Collapsed="true">
-    <Position X="13.75" Y="0.75" Width="1.5" />
+    <Position X="18.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAABAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\Package.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Server.Models.SpellCard">
-    <Position X="6.5" Y="2.25" Width="1.5" />
+  <Class Name="MTCG.Server.Models.SpellCard" Collapsed="true">
+    <Position X="12.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\SpellCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Server.Models.Stack" Collapsed="true">
-    <Position X="15.5" Y="0.75" Width="1.5" />
+    <Position X="20.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAIAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Stack.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Server.Models.Stats" Collapsed="true">
-    <Position X="12" Y="1.75" Width="1.5" />
+    <Position X="17" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAAAAAAAAgACAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
       <FileName>Models\Stats.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Server.Models.Trade" Collapsed="true">
-    <Position X="13.75" Y="1.75" Width="1.5" />
+    <Position X="18.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Trade.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Server.Models.User" Collapsed="true">
-    <Position X="15.5" Y="1.75" Width="1.5" />
+    <Position X="20.5" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAACAAAABAAgAACAAIACAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAADAAAAAAACAAAABAAgAACAAIACAAAAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Server.Util.Helper" Collapsed="true">
-    <Position X="10.25" Y="0.75" Width="1.5" />
+  <Class Name="MTCG.Server.Models.UserCredentials" Collapsed="true">
+    <Position X="17" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
-      <FileName>Util\Helper.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Models\UserCredentials.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Server.Util.SpecialtyHandler" Collapsed="true">
-    <Position X="10.25" Y="1.5" Width="1.5" />
+  <Struct Name="MTCG.Server.Config.DatabaseCredentials" Collapsed="true">
+    <Position X="8.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Util\SpecialtyHandler.cs</FileName>
+      <HashCode>AABACAAACAAAAAAAAAAAAAgAAACAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Config\DatabaseCredentials.cs</FileName>
     </TypeIdentifier>
-  </Class>
+  </Struct>
   <Enum Name="MTCG.Server.Util.Enums.BattleResult" Collapsed="true">
-    <Position X="13" Y="2.75" Width="1.5" />
+    <Position X="13.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAEAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Util\Enums\BattleResult.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="MTCG.Server.Util.Enums.CardType" Collapsed="true">
-    <Position X="15.25" Y="3" Width="1.5" />
+    <Position X="15.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
       <FileName>Util\Enums\CardType.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="MTCG.Server.Util.Enums.Element" Collapsed="true">
-    <Position X="17" Y="3" Width="1.5" />
+    <Position X="17" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
       <FileName>Util\Enums\Element.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="MTCG.Server.Util.Enums.Race" Collapsed="true">
-    <Position X="13.5" Y="3.75" Width="1.5" />
+    <Position X="13.5" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAQAAAEAAAAQAAAAAIAIAAAAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Util\Enums\Race.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="MTCG.Server.Util.Enums.Rarity" Collapsed="true">
-    <Position X="15.25" Y="3.75" Width="1.5" />
+    <Position X="15.25" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAEAAAAAAABAACAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Util\Enums\Rarity.cs</FileName>

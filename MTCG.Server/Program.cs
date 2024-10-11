@@ -1,11 +1,8 @@
-﻿using MTCG.Server.Config;
-using MTCG.Server.Util;
-using MTCG.Server.Util.DbUtil;
-using Npgsql;
+﻿using MTCG.Server.Util.DbUtil;
 
 namespace MTCG.Server
 {
-	class Program
+	internal class Program
 	{
 		private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
