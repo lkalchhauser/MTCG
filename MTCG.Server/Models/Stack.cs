@@ -1,4 +1,6 @@
-﻿namespace MTCG.Server.Models;
+﻿using MTCG.Server.Models.Cards;
+
+namespace MTCG.Server.Models;
 
 public class Stack
 {

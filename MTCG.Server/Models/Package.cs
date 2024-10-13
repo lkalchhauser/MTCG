@@ -1,4 +1,5 @@
-﻿using MTCG.Server.Util.Enums;
+﻿using MTCG.Server.Models.Cards;
+using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Models;
 
