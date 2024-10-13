@@ -108,7 +108,7 @@
     <Position X="10.25" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAIABABAAAAAQAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
-      <FileName>Models\Cards\TestCard.cs</FileName>
+      <FileName>Models\Cards\Card.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="_rarity" />
