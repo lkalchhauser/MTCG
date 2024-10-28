@@ -1,10 +1,14 @@
-﻿namespace MTCG.Server.Util;
+﻿using MTCG.Server.HTTP;
+
+namespace MTCG.Server.Util;
 
 using BCrypt.Net;
+using MTCG.Server.Services;
 
 public class Helper
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private static UserService _userService = new UserService();
 	public static string HashPassword(string password)
 	{
 		_logger.Debug("Hashing password");
@@ -38,6 +42,17 @@ public class Helper
 		{409, "Conflict"},
 		{500, "Internal Server Error"}
 	};
+
+	public static bool IsUserAuthorized(Handler handler)
+	{
+		var authUser = _userService.GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
+		if (authUser == null)
+		{
+			return false;
+		}
+		handler.AuthorizedUser = authUser;
+		return true;
+	}
 
 	public const string
 		TEXT_PLAIN = "text/plain",

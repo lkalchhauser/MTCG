@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
+using MTCG.Server.Util;
 
 namespace MTCG.Server.HTTP;
 
@@ -14,6 +15,7 @@ public class Router
 	private readonly DatabaseConnection _dbConnection = DatabaseConnection.Instance;
 	private UserService _userService = new UserService();
 	private CardService _cardService = new CardService();
+	private TransactionService _transactionService = new TransactionService();
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -72,7 +74,7 @@ public class Router
 					case "/packages":
 						_logger.Debug("Routing POST /packages");
 						var authUser = _userService.GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
-						if (authUser == null)
+						if (authUser is not { Username: "admin" })
 						{
 							handler.Reply(401);
 							return;
@@ -82,7 +84,14 @@ public class Router
 						handler.Reply(createPackageResult.Success ? 200 : 400, createPackageResult.Message, createPackageResult.ContentType);
 						break;
 					case "/transactions/packages":
-						// create new transaction
+						_logger.Debug("Routing POST /transactions/packages");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var getPackageResult = _transactionService.GetRandomPackageForUser(handler);
+						handler.Reply(getPackageResult.Success ? 200 : 400, getPackageResult.Message, getPackageResult.ContentType);
 						break;
 					case "/battles":
 						// create new battle

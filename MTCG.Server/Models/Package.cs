@@ -11,5 +11,5 @@ public class Package
     
 	public Rarity Rarity { get; set; }
 
-	public Card[] Cards { get; set; }
+	public List<Card> Cards { get; set; }
 }

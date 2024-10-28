@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
+using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Repositories;
 
@@ -34,5 +35,58 @@ public class PackageRepository
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@package_id", DbType.Int32, packageId);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@card_id", DbType.Int32, cardId);
 		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
+	public int GetRandomPackageId()
+	{
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT id
+			FROM packages
+			ORDER BY random()
+			limit 1
+			""");
+		using IDataReader reader = dbCommand.ExecuteReader();
+		return reader.Read() ? reader.GetInt32(0) : 0;
+	}
+
+	public Package GetPackageWithoutCardsById(int id)
+	{
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM packages
+			WHERE id = @id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, id);
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new Package()
+			{
+				Id = reader.GetInt32(0),
+				Name = reader.GetString(1),
+				Rarity = Enum.Parse<Rarity>(reader.GetString(2)),
+				Cost = reader.GetInt32(3),
+			};
+		}
+		return null;
+	}
+
+	public List<int> GetPackageCardIds(int packageId)
+	{
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT card_id
+			FROM package_card
+			WHERE package_id = @package_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@package_id", DbType.Int32, packageId);
+		using IDataReader reader = dbCommand.ExecuteReader();
+		List<int> cardIds = [];
+		while (reader.Read())
+		{
+			cardIds.Add(reader.GetInt32(0));
+			
+		}
+
+		return cardIds;
 	}
 }

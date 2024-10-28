@@ -77,13 +77,14 @@ public class UserRepository
 		_logger.Debug($"Updating user \"{JsonSerializer.Serialize(user)}\" in db");
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""
 			UPDATE users
-			SET username = @username, password = @password, token = @token
+			SET username = @username, password = @password, token = @token, coins = @coins
 			WHERE id = @id
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@username", DbType.String, user.Username);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@password", DbType.String, user.Password);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@token", DbType.String, user.Token);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, user.Id);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@coins", DbType.Int32, user.Coins);
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
