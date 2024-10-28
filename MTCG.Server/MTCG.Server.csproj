@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Repositories\" />
+    <Folder Include="Models\Cards\" />
   </ItemGroup>
 
   <ItemGroup>

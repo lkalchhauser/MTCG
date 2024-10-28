@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
+using MTCG.Server.Models;
 using MTCG.Server.Util;
 
 namespace MTCG.Server.HTTP;
@@ -22,6 +23,8 @@ public class Handler
 	public string? Payload { get; set; }
 
 	public int StatusCode { get; set; }
+
+	public UserCredentials AuthorizedUser { get; set; }
 
 	public async void Handle(TcpClient client)
 	{
@@ -103,6 +106,18 @@ public class Handler
 			if (httpHeader.Name == "Content-Type")
 			{
 				return httpHeader.Value;
+			}
+		}
+		return "";
+	}
+
+	public string GetAuthorizationToken()
+	{
+		foreach (var httpHeader in Headers)
+		{
+			if (httpHeader.Name == "Authorization")
+			{
+				return httpHeader.Value.Replace("Bearer ", "");
 			}
 		}
 		return "";

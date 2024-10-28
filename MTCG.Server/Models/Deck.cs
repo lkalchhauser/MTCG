@@ -1,6 +1,4 @@
-﻿using MTCG.Server.Models.Cards;
-
-namespace MTCG.Server.Models;
+﻿namespace MTCG.Server.Models;
 
 public class Deck
 {

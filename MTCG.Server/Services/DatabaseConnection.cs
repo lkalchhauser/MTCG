@@ -18,7 +18,7 @@ public class DatabaseConnection
 		{
 			if (_instance == null)
 			{
-				_instance = new DatabaseConnection($"Host={DatabaseCredentials.DB_HOST};Port={DatabaseCredentials.DB_PORT};Username={DatabaseCredentials.DB_USER};Password={DatabaseCredentials.DB_PASSWORD};Database={DatabaseCredentials.DB_NAME}");
+				_instance = new DatabaseConnection($"Host={DatabaseCredentials.DB_HOST};Port={DatabaseCredentials.DB_PORT};Username={DatabaseCredentials.DB_USER};Password={DatabaseCredentials.DB_PASSWORD};Database={DatabaseCredentials.DB_NAME};Include Error Detail=True");
 			}
 			return _instance;
 		}

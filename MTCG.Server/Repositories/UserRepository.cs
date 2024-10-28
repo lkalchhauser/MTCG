@@ -7,13 +7,8 @@ namespace MTCG.Server.Repositories;
 
 public class UserRepository
 {
-	private readonly DatabaseConnection _dbConn;
+	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-
-	public UserRepository()
-	{
-		_dbConn = DatabaseConnection.Instance;
-	}
 
 	public UserCredentials? GetUserByUsername(string username)
 	{
@@ -33,7 +28,33 @@ public class UserRepository
 				Id = reader.GetInt32(0),
 				Username = reader.GetString(1),
 				Password = reader.GetString(2),
-				Token = reader[3] as string ?? default(string)
+				Token = reader[3] as string ?? null,
+				Coins = reader.GetInt32(4)
+			};
+		}
+		return null;
+	}
+
+	public UserCredentials? GetUserByToken(string token)
+	{
+		_logger.Debug($"Trying to get user from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		                                                   SELECT *
+		                                                   FROM users
+		                                                   WHERE token = @token
+		                                                   """);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@token", DbType.String, token);
+
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new UserCredentials()
+			{
+				Id = reader.GetInt32(0),
+				Username = reader.GetString(1),
+				Password = reader.GetString(2),
+				Token = reader[3] as string ?? null,
+				Coins = reader.GetInt32(4)
 			};
 		}
 		return null;
@@ -48,7 +69,6 @@ public class UserRepository
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@username", DbType.String, user.Username);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@password", DbType.String, user.Password);
-		dbCommand.ExecuteNonQuery();
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 

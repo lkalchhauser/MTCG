@@ -7,12 +7,12 @@ using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class UserManager
+public class UserService
 {
 	private UserRepository _userRepository = new UserRepository();
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public Result RegisterUser(Handler handler, DatabaseConnection dbConnection)
+	public Result RegisterUser(Handler handler)
 	{
 		_logger.Debug("Register User - Registering user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -45,7 +45,7 @@ public class UserManager
 		return new Result(false, "Registration failed!");
 	}
 
-	public Result LoginUser(Handler handler, DatabaseConnection dbConnection)
+	public Result LoginUser(Handler handler)
 	{
 		_logger.Debug("Login User - Logging in user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -86,5 +86,10 @@ public class UserManager
 
 		_logger.Debug("Login User - Successfully logged in user");
 		return new Result(true, tokenStringified, Helper.APPL_JSON);
+	}
+
+	public UserCredentials? GetAuthorizedUserWithToken(string token)
+	{
+		return _userRepository.GetUserByToken(token);
 	}
 }

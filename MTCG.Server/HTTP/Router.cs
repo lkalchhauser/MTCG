@@ -12,7 +12,8 @@ public class Router
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	private readonly DatabaseConnection _dbConnection = DatabaseConnection.Instance;
-	private UserManager _userManager = new UserManager();
+	private UserService _userService = new UserService();
+	private CardService _cardService = new CardService();
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -60,16 +61,25 @@ public class Router
 				{
 					case "/users":
 						_logger.Debug("Routing POST /user");
-						var userRegisterResult = _userManager.RegisterUser(handler, _dbConnection);
+						var userRegisterResult = _userService.RegisterUser(handler);
 						handler.Reply(userRegisterResult.Success ? 201 : 400, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
 						_logger.Debug("Routing POST /sessions");
-						var userLoginResult = _userManager.LoginUser(handler, _dbConnection);
+						var userLoginResult = _userService.LoginUser(handler);
 						handler.Reply(userLoginResult.Success ? 200 : 400, userLoginResult.Message, userLoginResult.ContentType);
 						break;
 					case "/packages":
-						// create new package
+						_logger.Debug("Routing POST /packages");
+						var authUser = _userService.GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
+						if (authUser == null)
+						{
+							handler.Reply(401);
+							return;
+						}
+						handler.AuthorizedUser = authUser;
+						var createPackageResult = _cardService.CreatePackageAndCards(handler);
+						handler.Reply(createPackageResult.Success ? 200 : 400, createPackageResult.Message, createPackageResult.ContentType);
 						break;
 					case "/transactions/packages":
 						// create new transaction

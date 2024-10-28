@@ -1,0 +1,31 @@
+@startuml
+
+entity "user" as users {
+  id: number <<generated>>
+  --
+  username: varchar !null
+  password varchar !null
+  token varchar
+}
+
+entity "cards" as cards {
+  id: varchar !null
+  --
+  name: varchar !null
+  description: varchar !null
+  damage: varchar !null
+  type: varchar !null
+  element: varchar
+}
+
+entity "stats" as stats {
+    id: number <<generated>>
+    --
+    user_id: number !null
+    wins: number
+    losses: number
+    draws: number
+    elo: number
+}
+
+user ||-|| stats
