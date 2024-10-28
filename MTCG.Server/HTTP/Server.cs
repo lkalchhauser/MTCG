@@ -32,12 +32,17 @@ public class Server
 		while (_running)
 		{
 			// TODO: add tasking/asynchronous handling
+			
 			_logger.Info("Waiting for a connection..");
 			var client = _tcpListener.AcceptTcpClient();
-			var handler = new Handler();
-			handler.Handle(client);
-			_logger.Debug($"Recieved new request: \"{handler.PlainMessage}\"");
-			_router.HandleIncoming(handler);
+			Task.Run(() =>
+			{
+				var handler = new Handler();
+				handler.Handle(client);
+				_logger.Debug($"Recieved new request: \"{handler.PlainMessage}\"");
+				_router.HandleIncoming(handler);
+			});
+
 		}
 	}
 }

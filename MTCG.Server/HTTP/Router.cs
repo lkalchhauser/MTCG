@@ -19,7 +19,7 @@ public class Router
 		_dbHandler.SetupDbConnection();
 	}
 
-	public void HandleIncoming(Handler handler)
+	public async void HandleIncoming(Handler handler)
 	{
 		// COULD CHANGE THIS TO DIFFERENT ENDPOINTS
 		switch (handler.Method)

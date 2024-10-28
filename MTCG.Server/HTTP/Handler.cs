@@ -23,7 +23,7 @@ public class Handler
 
 	public int StatusCode { get; set; }
 
-	public void Handle(TcpClient client)
+	public async void Handle(TcpClient client)
 	{
 		_logger.Debug("Handling request");
 		Client = client;
@@ -32,7 +32,7 @@ public class Handler
 		var stream = client.GetStream();
 		while (stream.DataAvailable || data == "")
 		{
-			var n = stream.Read(buffer, 0, buffer.Length);
+			var n = await stream.ReadAsync(buffer, 0, buffer.Length);
 			data += Encoding.UTF8.GetString(buffer, 0, n);
 		}
 
@@ -70,7 +70,7 @@ public class Handler
 		}
 	}
 
-	public void Reply(int statusCode = 200, string? body = null, string? contentType = Helper.TEXT_PLAIN)
+	public async void Reply(int statusCode = 200, string? body = null, string? contentType = Helper.TEXT_PLAIN)
 	{
 		_logger.Debug("Replying to request");
 		StatusCode = statusCode;
@@ -91,7 +91,7 @@ public class Handler
 		_logger.Debug($"Sending response: {response}");
 
 		var tmpBuf = Encoding.ASCII.GetBytes(response);
-		Client.GetStream().Write(tmpBuf, 0, tmpBuf.Length);
+		await Client.GetStream().WriteAsync(tmpBuf, 0, tmpBuf.Length);
 		Client.GetStream().Close();
 		Client.Dispose();
 	}
