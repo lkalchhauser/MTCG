@@ -15,15 +15,16 @@ public class CardRepository
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""
 			INSERT INTO cards (uuid, name, description, damage, element, type, rarity, race)
 			VALUES (@uuid, @name, @description, @damage, @element, @type, @rarity, @race)
+			RETURNING id
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@uuid", DbType.String, card.UUID);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, card.Name);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@description", DbType.String, card.Description);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@damage", DbType.Int32, card.Damage);
-		DatabaseConnection.AddParameterWithValue(dbCommand, "@element", DbType.String, card.Element);
-		DatabaseConnection.AddParameterWithValue(dbCommand, "@type", DbType.String, card.Type);
-		DatabaseConnection.AddParameterWithValue(dbCommand, "@rarity", DbType.String, card.Rarity);
-		DatabaseConnection.AddParameterWithValue(dbCommand, "@race", DbType.String, card.Race);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@element", DbType.String, card.Element.ToString());
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@type", DbType.String, card.Type.ToString());
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@rarity", DbType.String, card.Rarity.ToString());
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@race", DbType.String, card.Race.ToString());
 		card.Id = (int)(dbCommand.ExecuteScalar() ?? 0);
 		return card.Id != 0;
 	}

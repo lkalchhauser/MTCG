@@ -4,7 +4,9 @@ namespace MTCG.Server.Models;
 
 public class Package
 {
-	
+	public int Id { get; set; }
+	public string Name { get; set; }
+
 	public int Cost { get; set; } = 5;
     
 	public Rarity Rarity { get; set; }
