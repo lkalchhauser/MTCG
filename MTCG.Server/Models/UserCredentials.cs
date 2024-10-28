@@ -2,12 +2,8 @@
 
 public class UserCredentials
 {
+	public int Id { get; set; }
 	public string Username { get; set; }
 	public string Password { get; set; }
-
-	public UserCredentials(string username, string password)
-	{
-		Username = username;
-		Password = password;
-	}
+	public string? Token { get; set; }
 }

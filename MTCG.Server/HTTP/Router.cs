@@ -11,13 +11,8 @@ namespace MTCG.Server.HTTP;
 public class Router
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly DatabaseHandler _dbHandler = DatabaseHandler.Instance;
+	private readonly DatabaseConnection _dbConnection = DatabaseConnection.Instance;
 	private UserManager _userManager = new UserManager();
-
-	public Router()
-	{
-		_dbHandler.SetupDbConnection();
-	}
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -65,12 +60,12 @@ public class Router
 				{
 					case "/users":
 						_logger.Debug("Routing POST /user");
-						var userRegisterResult = _userManager.RegisterUser(handler, _dbHandler);
+						var userRegisterResult = _userManager.RegisterUser(handler, _dbConnection);
 						handler.Reply(userRegisterResult.Success ? 201 : 400, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
 						_logger.Debug("Routing POST /sessions");
-						var userLoginResult = _userManager.LoginUser(handler, _dbHandler);
+						var userLoginResult = _userManager.LoginUser(handler, _dbConnection);
 						handler.Reply(userLoginResult.Success ? 200 : 400, userLoginResult.Message, userLoginResult.ContentType);
 						break;
 					case "/packages":

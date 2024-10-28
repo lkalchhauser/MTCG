@@ -1,6 +1,7 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using System.Text.Json;
+using MTCG.Server.Repositories;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
@@ -8,9 +9,10 @@ namespace MTCG.Server.Services;
 
 public class UserManager
 {
+	private UserRepository _userRepository = new UserRepository();
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public Result RegisterUser(Handler handler, DatabaseHandler dbHandler)
+	public Result RegisterUser(Handler handler, DatabaseConnection dbConnection)
 	{
 		_logger.Debug("Register User - Registering user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -21,7 +23,8 @@ public class UserManager
 
 		// TODO: what if its not valid? -> catch exception?
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
-		if (dbHandler.DoesUserExist(credentials.Username))
+		var getUserFromDb = _userRepository.GetUserByUsername(credentials.Username);
+		if (getUserFromDb != null)
 		{
 			_logger.Debug("Register User - User already exists");
 			return new Result(false, "User already exists!");
@@ -31,7 +34,7 @@ public class UserManager
 
 		credentials.Password = hashedPassword;
 
-		var registerSuccessful = dbHandler.RegisterUser(credentials);
+		var registerSuccessful = _userRepository.AddUser(credentials);
 
 		if (registerSuccessful)
 		{
@@ -42,7 +45,7 @@ public class UserManager
 		return new Result(false, "Registration failed!");
 	}
 
-	public Result LoginUser(Handler handler, DatabaseHandler dbHandler)
+	public Result LoginUser(Handler handler, DatabaseConnection dbConnection)
 	{
 		_logger.Debug("Login User - Logging in user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -53,15 +56,32 @@ public class UserManager
 
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
 
-		var userToken = dbHandler.LoginUser(credentials);
-
-		if (string.IsNullOrEmpty(userToken))
+		var userFromDb = _userRepository.GetUserByUsername(credentials.Username);
+		if (userFromDb == null)
 		{
-			_logger.Debug("Login User - Login failed");
-			return new Result(false, "Login failed!");
+			_logger.Debug("Login User - Login failed - User does not exist");
+			return new Result(false, "Login failed - User does not exist");
 		}
 
-		var temp = new { token = userToken };
+		if (!Helper.VerifyPassword(credentials.Password, userFromDb.Password))
+		{
+			_logger.Debug("Password invalid! - Invalid Password");
+			return new Result(false, "Login failed - Login Data not correct");
+		}
+
+		_logger.Debug("Password valid! Generating token...");
+		userFromDb.Token = Helper.GenerateToken(credentials.Username);
+		_logger.Debug("Saving token into DB...");
+		var userUpdateSuccessful = _userRepository.UpdateUser(userFromDb);
+
+		if (!userUpdateSuccessful)
+		{
+			_logger.Debug("Login User - Failed to update user");
+			// TODO: maybe add response code to Result - should be internal server error here
+			return new Result(true, "Login failed - internal error");
+		}
+
+		var temp = new { token = userFromDb.Token };
 		var tokenStringified = JsonSerializer.Serialize(temp);
 
 		_logger.Debug("Login User - Successfully logged in user");

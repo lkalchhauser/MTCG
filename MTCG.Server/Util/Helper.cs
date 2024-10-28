@@ -18,7 +18,7 @@ public class Helper
 		return BCrypt.Verify(password, hash);
 	}
 
-	public static string GenerateToken(string username)
+	public static string? GenerateToken(string username)
 	{
 		_logger.Debug("Generating token");
 		//TODO make this better (for test script it has to stay like this)
