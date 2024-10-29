@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
 using MTCG.Server.Util.Enums;
@@ -44,6 +45,36 @@ public class CardRepository
 
 		Card card;
 		card = new Card()
+		{
+			Id = reader.GetInt32(0),
+			UUID = reader.GetString(1),
+			Name = reader.GetString(2),
+			Description = reader.GetString(3),
+			Damage = reader.GetFloat(4),
+			Element = Enum.Parse<Element>(reader.GetString(5)),
+			Type = Enum.Parse<CardType>(reader.GetString(6)),
+			Rarity = Enum.Parse<Rarity>(reader.GetString(7))
+		};
+		if (Enum.TryParse<Race>(reader.GetString(8), out var race))
+		{
+			card.Race = race;
+		}
+		return card;
+	}
+
+	public Card? GetCardByUuid(string uuid)
+	{
+		_logger.Debug($"Getting card with uuid \"{uuid}\" from the DB");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM cards
+			WHERE uuid = @uuid
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@uuid", DbType.String, uuid);
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (!reader.Read()) return null;
+
+		var card = new Card()
 		{
 			Id = reader.GetInt32(0),
 			UUID = reader.GetString(1),

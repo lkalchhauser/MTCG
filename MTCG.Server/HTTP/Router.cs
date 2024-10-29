@@ -44,7 +44,7 @@ public class Router
 						handler.Reply(getCardsResult.Success ? 200 : 400, getCardsResult.Message, getCardsResult.ContentType);
 						// return all cards
 						break;
-					case "/deck":
+					case { } s when s.StartsWith("/deck"):
 						_logger.Debug("Routing GET /cards");
 						if (!Helper.IsUserAuthorized(handler))
 						{
@@ -128,6 +128,16 @@ public class Router
 				// tradings/{tradingdealid}
 				break;
 			case "PUT":
+				case "/deck":
+				_logger.Debug("Routing PUT /deck");
+				if (!Helper.IsUserAuthorized(handler))
+				{
+					handler.Reply(401);
+					break;
+				}
+				var setDeckResult = _deckService.SetDeckForCurrentUser(handler);
+				handler.Reply(setDeckResult.Success ? 200 : 400, setDeckResult.Message, setDeckResult.ContentType);
+				break;
 				// users/username
 				// deck
 				break;

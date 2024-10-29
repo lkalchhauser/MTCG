@@ -17,6 +17,7 @@ public class Handler
 	public virtual string Method { get; set; }
 
 	public virtual string Path { get; set; }
+	public List<QueryParam> QueryParams { get; set; } = [];
 
 	public HttpHeader[] Headers { get; set; }
 
@@ -51,7 +52,7 @@ public class Handler
 			{
 				var splitLines = requestLines[0].Split(" ");
 				Method = splitLines[0];
-				Path = splitLines[1];
+				FormatPath(splitLines[1]);
 			} else if (inlineHeaders)
 			{
 				if (string.IsNullOrWhiteSpace(requestLines[i]))
@@ -70,6 +71,42 @@ public class Handler
 			}
 
 			Headers = headers.ToArray();
+		}
+	}
+
+	public void FormatPath(string path)
+	{
+		if (path.Contains('?'))
+		{
+			var split1Path = path.Split("?");
+			Path = split1Path[0];
+
+			if (split1Path[1].Contains('&'))
+			{
+				var split2Path = split1Path[1].Split("&");
+				foreach (var split in split2Path)
+				{
+					var split3Path = split.Split("=");
+					QueryParams.Add(new QueryParam()
+					{
+						Key = split3Path[0],
+						Value = split3Path[1]
+					});
+				}
+
+				return;
+			};
+
+			var splitQueryPath = split1Path[1].Split("=");
+			QueryParams.Add(new QueryParam()
+			{
+				Key = splitQueryPath[0],
+				Value = splitQueryPath[1]
+			});
+		}
+		else
+		{
+			Path = path;
 		}
 	}
 
