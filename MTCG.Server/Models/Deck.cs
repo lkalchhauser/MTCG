@@ -2,7 +2,5 @@
 
 public class Deck
 {
-	private User _owner;
-
-	private List<Card> _cards;
+	public List<Card> Cards;
 }

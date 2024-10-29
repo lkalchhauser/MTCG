@@ -16,6 +16,7 @@ public class Router
 	private UserService _userService = new UserService();
 	private CardService _cardService = new CardService();
 	private TransactionService _transactionService = new TransactionService();
+	private DeckService _deckService = new DeckService();
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -44,7 +45,14 @@ public class Router
 						// return all cards
 						break;
 					case "/deck":
-						// return deck of user
+						_logger.Debug("Routing GET /cards");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var userDeckResult = _deckService.GetDeckForCurrentUser(handler);
+						handler.Reply(userDeckResult.Success ? 200 : 400, userDeckResult.Message, userDeckResult.ContentType);
 						break;
 					case "/stats":
 						// return stats of user
