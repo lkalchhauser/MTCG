@@ -98,6 +98,29 @@ public class CardRepository
 		return null;
 	}
 
+	public List<UserCardRelation> GetAllCardRelationsForUserId(int userId)
+	{
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM user_card
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userId);
+		using IDataReader reader = dbCommand.ExecuteReader();
+		List<UserCardRelation> cardIds = [];
+		while (reader.Read())
+		{
+			cardIds.Add(new UserCardRelation()
+			{
+				UserId = reader.GetInt32(0),
+				CardId = reader.GetInt32(1),
+				Quantity = reader.GetInt32(2),
+				LockedAmount = reader.GetInt32(3)
+			});
+		}
+		return cardIds;
+	}
+
 	public bool UpdateUserStack(UserCardRelation userCardRelation)
 	{
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""

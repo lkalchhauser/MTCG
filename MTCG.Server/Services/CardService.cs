@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
@@ -120,6 +122,39 @@ public class CardService
 		relation.LockedAmount--;
 		_cardRepository.UpdateUserStack(relation);
 		return true;
+	}
 
+	public Result ShowAllCardsForUser(Handler handler)
+	{
+		var userCardRelations = _cardRepository.GetAllCardRelationsForUserId(handler.AuthorizedUser.Id);
+		if (userCardRelations.Count == 0)
+		{
+			return new Result(true, "No cards found for user!");
+		}
+		List<UserCards> cards = [];
+		foreach (var userCardRelation in userCardRelations)
+		{
+			var card = _cardRepository.GetCardById(userCardRelation.CardId);
+			if (card == null)
+			{
+				return new Result(false, "Error while getting the cards");
+			}
+			cards.Add(new UserCards()
+			{
+				Id = card.Id,
+				UUID = card.UUID,
+				Type = card.Type,
+				Element = card.Element,
+				Rarity = card.Rarity,
+				Name = card.Name,
+				Description = card.Description,
+				Damage = card.Damage,
+				Race = card.Race,
+				Quantity = userCardRelation.Quantity,
+				LockedAmount = userCardRelation.LockedAmount
+			});
+		}
+
+		return new Result(true, JsonSerializer.Serialize(cards), Helper.APPL_JSON);
 	}
 }

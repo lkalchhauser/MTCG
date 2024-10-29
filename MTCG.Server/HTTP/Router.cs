@@ -33,6 +33,14 @@ public class Router
 						// return user with username
 						break;
 					case "/cards":
+						_logger.Debug("Routing GET /cards");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var getCardsResult = _cardService.ShowAllCardsForUser(handler);
+						handler.Reply(getCardsResult.Success ? 200 : 400, getCardsResult.Message, getCardsResult.ContentType);
 						// return all cards
 						break;
 					case "/deck":
