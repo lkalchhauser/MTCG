@@ -49,7 +49,8 @@ public class DbUtil
 		                                          id SERIAL PRIMARY KEY,
 		                                          name VARCHAR UNIQUE NOT NULL,
 		                                          rarity VARCHAR,
-		                                          cost DECIMAL DEFAULT 5
+		                                          cost DECIMAL DEFAULT 5,
+		                                          available_amount int DEFAULT 1
 		                                          );
 		                                          """, connection);
 		createPackageTable.ExecuteNonQuery();

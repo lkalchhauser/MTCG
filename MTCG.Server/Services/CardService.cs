@@ -35,12 +35,22 @@ public class CardService
 			return new Result(false, "Failed to add card to database!");
 		}
 
+		// check if a package with the same name already exists
+		var packageByName = _packageRepository.GetPackageIdByName(package.Name);
+
+		if (packageByName != null)
+		{
+			packageByName.AvailableAmount++;
+			_packageRepository.UpdatePackage(packageByName);
+			return new Result(true, "Package already exists, increased available amount!");
+		}
+
 		_packageRepository.AddPackage(package);
 
 		foreach (var cardId in cardIds)
 		{
-			
 			if (_packageRepository.AddPackageCardRelation(package.Id, cardId)) continue;
+
 			_logger.Debug($"Failed to add card \"{cardId}\" to package \"{package.Id}\"");
 			return new Result(false, "Failed to add card to package");
 		}

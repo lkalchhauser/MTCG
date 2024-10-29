@@ -12,4 +12,6 @@ public class Package
 	public Rarity Rarity { get; set; }
 
 	public List<Card> Cards { get; set; }
+
+	public int AvailableAmount { get; set; } = 1;
 }

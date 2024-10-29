@@ -23,6 +23,13 @@ public class TransactionService
 			return new Result(false, "No packages found!");
 		}
 		var package = _packageRepository.GetPackageWithoutCardsById(pckgId);
+
+		if (handler.AuthorizedUser.Coins < package.Cost)
+		{
+			_logger.Debug("GetRandomPackageForUser - Not enough coins");
+			return new Result(false, "Not enough coins!");
+		}
+
 		var packageCardIds = _packageRepository.GetPackageCardIds(pckgId);
 
 		foreach (var cardId in packageCardIds)
@@ -32,11 +39,24 @@ public class TransactionService
 
 		handler.AuthorizedUser.Coins -= package.Cost;
 		_userRepository.UpdateUser(handler.AuthorizedUser);
+		RemoveOnePackageById(package.Id);
 
 		//List<Card> cards = [];
 
 		//cards.AddRange(packageCardIds.Select(cardId => _cardRep.GetCardById(cardId)).OfType<Card>());
 
 		return new Result(true, "");
+	}
+
+	public void RemoveOnePackageById(int packageId)
+	{
+		var package = _packageRepository.GetPackageWithoutCardsById(packageId);
+		if (package.AvailableAmount == 1)
+		{
+			_packageRepository.DeletePackage(package.Id);
+			return;
+		}
+		package.AvailableAmount--;
+		_packageRepository.UpdatePackage(package);
 	}
 }

@@ -14,15 +14,56 @@ public class PackageRepository
 	{
 		_logger.Debug($"Adding package \"{package.Name}\" to the DB");
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""
-			INSERT INTO packages (name, rarity, cost)
-			VALUES (@name, @rarity, @cost)
+			INSERT INTO packages (name, rarity, cost, available_amount)
+			VALUES (@name, @rarity, @cost, @available_amount)
 			RETURNING id
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, package.Name);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@rarity", DbType.String, package.Rarity.ToString());
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@cost", DbType.Int32, package.Cost);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@available_amount", DbType.Int32, package.AvailableAmount);
 		package.Id = (int)(dbCommand.ExecuteScalar() ?? 0);
 		return package.Id != 0;
+	}
+
+	public Package? GetPackageIdByName(string name)
+	{
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM packages
+			WHERE name = @name
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, name);
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new Package()
+			{
+				Id = reader.GetInt32(0),
+				Name = reader.GetString(1),
+				Rarity = Enum.Parse<Rarity>(reader.GetString(2)),
+				Cost = reader.GetInt32(3),
+				AvailableAmount = reader.GetInt32(4)
+			};
+		}
+
+		return null;
+	}
+
+	public bool UpdatePackage(Package package)
+	{
+		_logger.Debug($"Updating package \"{package.Name}\"");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			UPDATE packages
+			SET name = @name, rarity = @rarity, cost = @cost, available_amount = @available_amount
+			WHERE id = @id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, package.Name);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@rarity", DbType.String, package.Rarity.ToString());
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@cost", DbType.Int32, package.Cost);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@available_amount", DbType.Int32, package.AvailableAmount);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, package.Id);
+		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
 	public bool AddPackageCardRelation(int packageId, int cardId)
@@ -66,6 +107,7 @@ public class PackageRepository
 				Name = reader.GetString(1),
 				Rarity = Enum.Parse<Rarity>(reader.GetString(2)),
 				Cost = reader.GetInt32(3),
+				AvailableAmount = reader.GetInt32(4)
 			};
 		}
 		return null;
@@ -84,9 +126,19 @@ public class PackageRepository
 		while (reader.Read())
 		{
 			cardIds.Add(reader.GetInt32(0));
-			
 		}
 
 		return cardIds;
+	}
+
+	public bool DeletePackage(int id)
+	{
+		_logger.Debug($"Deleting package with id \"{id}\"");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			DELETE FROM packages
+			WHERE id = @id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, id);
+		return dbCommand.ExecuteNonQuery() == 1;
 	}
 }
