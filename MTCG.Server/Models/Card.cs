@@ -19,4 +19,15 @@ public class Card
 	public float Damage { get; set; }
 
 	public Race? Race { get; set; } = null;
+
+	public override string ToString()
+	{
+		var s = $"UUID: {UUID}; Type: {Type}; Element: {Element}; Rarity: {Rarity}; Name: {Name}; Description '{Description}'; Damage: {Damage};";
+		if (Race != null)
+		{
+			s += $"Race: {Race};";
+		}
+
+		return s;
+	}
 }

@@ -39,10 +39,9 @@ public class DeckService
 
 		if (handler.QueryParams.Any(param => param is { Key: "format", Value: "plain" }))
 		{
-			// TODO: what exactly is meant by format plain - currently we return it with json but different content type
-			return new Result(true, serializedDeckCards, Helper.TEXT_PLAIN);
+			var finalText = deck.Cards.Aggregate("", (current, deckCard) => current + (deckCard + "\n"));
+			return new Result(true, finalText, Helper.TEXT_PLAIN);
 		}
-		
 		return new Result(true, serializedDeckCards, Helper.APPL_JSON);
 	}
 
