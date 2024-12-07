@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
 using MTCG.Server.Util;
+using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.HTTP;
 
@@ -17,6 +18,7 @@ public class Router
 	private CardService _cardService = new CardService();
 	private TransactionService _transactionService = new TransactionService();
 	private DeckService _deckService = new DeckService();
+	private BattleService _battleService = new BattleService();
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -45,7 +47,7 @@ public class Router
 						// return all cards
 						break;
 					case { } s when s.StartsWith("/deck"):
-						_logger.Debug("Routing GET /cards");
+						_logger.Debug("Routing GET /deck");
 						if (!Helper.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
@@ -110,7 +112,15 @@ public class Router
 						handler.Reply(getPackageResult.Success ? 200 : 400, getPackageResult.Message, getPackageResult.ContentType);
 						break;
 					case "/battles":
-						// create new battle
+						_logger.Debug("Routing POST /battles");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
+						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1));
+						handler.Reply(battleRequestResult.Success ? 200 : 408, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
 					case "/tradings":
 						// create new trading
