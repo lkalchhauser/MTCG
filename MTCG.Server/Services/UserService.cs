@@ -36,10 +36,24 @@ public class UserService
 
 		var registerSuccessful = _userRepository.AddUser(credentials);
 
-		if (registerSuccessful)
+		if (registerSuccessful != 0)
 		{
 			_logger.Debug("Register User - Successfully registered user");
-			return new Result(true, "Successfully registered!");
+			_logger.Debug("Adding default user stats");
+			var addUserStatsSuccessful = _userRepository.AddUserStats(new UserStats()
+			{
+				Id = registerSuccessful,
+				Elo = 100,
+				Draws = 0,
+				Losses = 0,
+				Wins = 0
+			});
+
+			if (addUserStatsSuccessful) return new Result(true, "Successfully registered!");
+
+			_logger.Debug("Register User - Failed to add default user stats");
+			return new Result(false, "Failed to add default user stats");
+
 		}
 		_logger.Debug("Register User - Registration failed");
 		return new Result(false, "Registration failed!");
@@ -135,5 +149,11 @@ public class UserService
 		}
 		var userInfoDeleted = _userRepository.RemoveUserInfoByUserId(handler.AuthorizedUser.Id);
 		return userInfoDeleted ? new Result(true, "User info successfully deleted") : new Result(false, "Error while deleting user info");
+	}
+
+	public Result GetUserStats(Handler handler)
+	{
+		var userStats = _userRepository.GetUserStats(handler);
+		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), Helper.APPL_JSON);
 	}
 }

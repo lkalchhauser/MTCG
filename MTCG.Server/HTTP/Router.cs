@@ -65,7 +65,14 @@ public class Router
 						handler.Reply(userDeckResult.Success ? 200 : 400, userDeckResult.Message, userDeckResult.ContentType);
 						break;
 					case "/stats":
-						// return stats of user
+						_logger.Debug("Routing GET /stats");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var userStatsResult = _userService.GetUserStats(handler);
+						handler.Reply(userStatsResult.Success ? 200 : 400, userStatsResult.Message, userStatsResult.ContentType);
 						break;
 					case "/scoreboard":
 						// return scoreboard

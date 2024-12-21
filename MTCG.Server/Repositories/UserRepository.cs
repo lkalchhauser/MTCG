@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text.Json;
+using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
 
@@ -60,16 +61,18 @@ public class UserRepository
 		return null;
 	}
 
-	public bool AddUser(UserCredentials user)
+	public int AddUser(UserCredentials user)
 	{
 		_logger.Debug($"Adding user \"{JsonSerializer.Serialize(user)}\" to db");
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""
 			INSERT INTO users (username, password)
 			VALUES (@username, @password)
+			RETURNING id
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@username", DbType.String, user.Username);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@password", DbType.String, user.Password);
-		return dbCommand.ExecuteNonQuery() == 1;
+		var userId = (int)(dbCommand.ExecuteScalar() ?? 0);
+		return userId;
 	}
 
 	public bool UpdateUser(UserCredentials user)
@@ -160,6 +163,46 @@ public class UserRepository
 			WHERE user_id = @user_id
 			""");
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userId);
+		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
+	public UserStats? GetUserStats(Handler handler)
+	{
+		_logger.Debug($"Trying to get stats from \"{handler.AuthorizedUser.Username}\" from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM stats
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, handler.AuthorizedUser.Id);
+
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new UserStats()
+			{
+				Id = reader.GetInt32(0),
+				Elo = reader.GetInt32(1),
+				Wins = reader.GetInt32(2),
+				Losses = reader.GetInt32(3),
+				Draws = reader.GetInt32(4),
+			};
+		}
+		return null;
+	}
+
+	public bool AddUserStats(UserStats userStats)
+	{
+		_logger.Debug($"Adding stats \"{JsonSerializer.Serialize(userStats)}\" to db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			INSERT INTO stats (user_id, elo, wins, losses, draws)
+			VALUES (@user_id, @elo, @wins, @losses, @draws)
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userStats.Id);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@elo", DbType.Int32, userStats.Elo);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@wins", DbType.Int32, userStats.Wins);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@losses", DbType.Int32, userStats.Losses);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@draws", DbType.Int32, userStats.Draws);
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 }
