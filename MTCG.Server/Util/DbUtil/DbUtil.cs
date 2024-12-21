@@ -27,6 +27,19 @@ public class DbUtil
 		                                        """, connection);
 		createUserTable.ExecuteNonQuery();
 
+		var dropUserInfoTable = new NpgsqlCommand("DROP TABLE IF EXISTS userinfo CASCADE", connection);
+		dropUserInfoTable.ExecuteNonQuery();
+
+		var createUserInfoTable = new NpgsqlCommand("""
+		                                        CREATE TABLE userinfo(
+		                                        user_id int UNIQUE PRIMARY KEY NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		                                        name VARCHAR,
+		                                        bio VARCHAR,
+		                                        image VARCHAR
+		                                        );
+		                                        """, connection);
+		createUserInfoTable.ExecuteNonQuery();
+
 		// User stats
 		var dropStatsTable = new NpgsqlCommand("DROP TABLE IF EXISTS stats CASCADE", connection);
 		dropStatsTable.ExecuteNonQuery();

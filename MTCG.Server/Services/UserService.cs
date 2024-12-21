@@ -92,4 +92,48 @@ public class UserService
 	{
 		return _userRepository.GetUserByToken(token);
 	}
+
+	public Result GetUserInformationForUser(Handler handler)
+	{
+		var userInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+		if (userInfo == null)
+		{
+			_logger.Debug("Failed to get user information (null return from db)");
+			return new Result(false, "Failed to get user information - no data found");
+		}
+		_logger.Debug($"Successfully got user information: {JsonSerializer.Serialize(userInfo)}");
+		return new Result(true, JsonSerializer.Serialize(userInfo), Helper.APPL_JSON);
+	}
+
+	public Result AddOrUpdateUserInfo(Handler handler)
+	{
+		if (handler.Payload == null)
+		{
+			return new Result(false, "No payload data found");
+		}
+
+		var newUserInfo = JsonSerializer.Deserialize<UserInfo>(handler.Payload);
+		newUserInfo.Id = handler.AuthorizedUser.Id;
+		var getExistingUserInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+
+		if (getExistingUserInfo == null)
+		{
+			var addUserInfoSuccessful = _userRepository.AddUserInfo(newUserInfo);
+			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), Helper.APPL_JSON) : new Result(false, "Error while adding info to database");
+		}
+		
+		var updateUserInfoSuccessful = _userRepository.UpdateUserInfo(newUserInfo);
+		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), Helper.APPL_JSON) : new Result(false, "Error while adding info to database");
+	}
+
+	public Result DeleteUserInfo(Handler handler)
+	{
+		var existingUserInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+		if (existingUserInfo == null)
+		{
+			return new Result(false, "No user info found to delete");
+		}
+		var userInfoDeleted = _userRepository.RemoveUserInfoByUserId(handler.AuthorizedUser.Id);
+		return userInfoDeleted ? new Result(true, "User info successfully deleted") : new Result(false, "Error while deleting user info");
+	}
 }

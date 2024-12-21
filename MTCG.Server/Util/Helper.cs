@@ -54,6 +54,19 @@ public class Helper
 		return true;
 	}
 
+	public static bool IsRequestedUserAuthorizedUser(Handler handler)
+	{
+		var username = ExtractUsernameFromPath(handler.Path);
+		return handler.AuthorizedUser?.Username == username;
+	}
+
+	public static string ExtractUsernameFromPath(string path)
+	{
+		var split = path.Split("/");
+		var username = split[^1];
+		return username;
+	}
+
 	public const string
 		TEXT_PLAIN = "text/plain",
 		APPL_JSON = "application/json";

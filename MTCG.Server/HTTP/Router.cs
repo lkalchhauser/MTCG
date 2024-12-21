@@ -32,8 +32,16 @@ public class Router
 						_logger.Debug("Routing GET /");
 						handler.Reply(200, "Welcome to the Monster Trading Card Game Server!");
 						break;
-					case "/users/username": // TODO: change to include
-						// return user with username
+					case { } s when s.StartsWith("/users/"):
+						_logger.Debug($"Routing GET {s}");
+						if (!Helper.IsUserAuthorized(handler) || !Helper.IsRequestedUserAuthorizedUser(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
+						var getUserInfoResult = _userService.GetUserInformationForUser(handler);
+						handler.Reply(getUserInfoResult.Success ? 200 : 400, getUserInfoResult.Message, getUserInfoResult.ContentType);
 						break;
 					case "/cards":
 						_logger.Debug("Routing GET /cards");
@@ -138,20 +146,49 @@ public class Router
 				// tradings/{tradingdealid}
 				break;
 			case "PUT":
-				case "/deck":
-				_logger.Debug("Routing PUT /deck");
-				if (!Helper.IsUserAuthorized(handler))
+				switch (handler.Path)
 				{
-					handler.Reply(401);
-					break;
+					case "/deck":
+						_logger.Debug("Routing PUT /deck");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
+						var setDeckResult = _deckService.SetDeckForCurrentUser(handler);
+						handler.Reply(setDeckResult.Success ? 200 : 400, setDeckResult.Message, setDeckResult.ContentType);
+						break;
+
+					case { } s when s.StartsWith("/users/"):
+						_logger.Debug($"Routing PUT {handler.Path}");
+						if (!Helper.IsUserAuthorized(handler) || !Helper.IsRequestedUserAuthorizedUser(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
+						var addOrUpdateUserInfoResult = _userService.AddOrUpdateUserInfo(handler);
+						handler.Reply(addOrUpdateUserInfoResult.Success ? 200 : 400, addOrUpdateUserInfoResult.Message, addOrUpdateUserInfoResult.ContentType);
+						break;
 				}
-				var setDeckResult = _deckService.SetDeckForCurrentUser(handler);
-				handler.Reply(setDeckResult.Success ? 200 : 400, setDeckResult.Message, setDeckResult.ContentType);
 				break;
-				// users/username
-				// deck
-				break;
+
+			// deck
 			case "DELETE":
+				switch (handler.Path)
+				{
+					case "/users/userinfo":
+						_logger.Debug("Routing DELETE /users/userinfo");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var deleteUserInfoResult = _userService.DeleteUserInfo(handler);
+						handler.Reply(deleteUserInfoResult.Success ? 200 : 400, deleteUserInfoResult.Message, deleteUserInfoResult.ContentType);
+						break;
+				}
 				// tradings/{tradingdealid}
 				break;
 		}

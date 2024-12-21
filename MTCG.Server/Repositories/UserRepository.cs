@@ -98,4 +98,68 @@ public class UserRepository
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, userId);
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
+
+	public UserInfo? GetUserInfoByUser(UserCredentials user)
+	{
+		_logger.Debug($"Trying to get userinfo from \"{user.Username}\" from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM userinfo
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, user.Id);
+
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new UserInfo()
+			{
+				Id = reader.GetInt32(0),
+				Name = reader.GetString(1),
+				Bio = reader.GetString(2),
+				Image = reader.GetString(3),
+			};
+		}
+		return null;
+	}
+
+	public bool AddUserInfo(UserInfo userInfo)
+	{
+		_logger.Debug($"Adding userinfo \"{JsonSerializer.Serialize(userInfo)}\" to db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			INSERT INTO userinfo (user_id, name, bio, image)
+			VALUES (@user_id, @name, @bio, @image)
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userInfo.Id);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, userInfo.Name);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@bio", DbType.String, userInfo.Bio);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@image", DbType.String, userInfo.Image);
+		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
+	public bool UpdateUserInfo(UserInfo userInfo)
+	{
+		_logger.Debug($"Updating userinfo \"{JsonSerializer.Serialize(userInfo)}\" in db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			UPDATE userinfo
+			SET name = @name, bio = @bio, image = @image
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@name", DbType.String, userInfo.Name);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@bio", DbType.String, userInfo.Bio);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@image", DbType.String, userInfo.Image);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userInfo.Id);
+		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
+	public bool RemoveUserInfoByUserId(int userId)
+	{
+		_logger.Debug($"Removing userinfo with user_id {userId} from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			DELETE FROM userinfo
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userId);
+		return dbCommand.ExecuteNonQuery() == 1;
+	}
 }
