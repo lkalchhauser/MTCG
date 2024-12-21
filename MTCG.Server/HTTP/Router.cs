@@ -75,7 +75,9 @@ public class Router
 						handler.Reply(userStatsResult.Success ? 200 : 400, userStatsResult.Message, userStatsResult.ContentType);
 						break;
 					case "/scoreboard":
-						// return scoreboard
+						_logger.Debug("Routing GET /scoreboard");
+						var getScoreboardResult = _userService.GetScoreboard(handler);
+						handler.Reply(getScoreboardResult.Success ? 200 : 400, getScoreboardResult.Message, getScoreboardResult.ContentType);
 						break;
 					case "/tradings":
 						// return all tradings

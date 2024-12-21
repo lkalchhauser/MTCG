@@ -36,6 +36,31 @@ public class UserRepository
 		return null;
 	}
 
+	public UserCredentials? GetUserById(int id)
+	{
+		_logger.Debug($"Trying to get user \"{id}\" from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			SELECT *
+			FROM users
+			WHERE id = @id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@id", DbType.Int32, id);
+
+		using IDataReader reader = dbCommand.ExecuteReader();
+		if (reader.Read())
+		{
+			return new UserCredentials()
+			{
+				Id = reader.GetInt32(0),
+				Username = reader.GetString(1),
+				Password = reader.GetString(2),
+				Token = reader[3] as string ?? null,
+				Coins = reader.GetInt32(4)
+			};
+		}
+		return null;
+	}
+
 	public UserCredentials? GetUserByToken(string token)
 	{
 		_logger.Debug($"Trying to get user from db");
@@ -204,5 +229,29 @@ public class UserRepository
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@losses", DbType.Int32, userStats.Losses);
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@draws", DbType.Int32, userStats.Draws);
 		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
+	public List<UserStats> GetAllStats()
+	{
+		_logger.Debug($"Trying to get all stats from db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		                                                   SELECT *
+		                                                   FROM stats
+		                                                   """);
+
+		using IDataReader reader = dbCommand.ExecuteReader();
+		List<UserStats> stats = [];
+		while (reader.Read())
+		{
+			stats.Add(new UserStats()
+			{
+				Id = reader.GetInt32(0),
+				Elo = reader.GetInt32(1),
+				Wins = reader.GetInt32(2),
+				Losses = reader.GetInt32(3),
+				Draws = reader.GetInt32(4),
+			});
+		}
+		return stats;
 	}
 }

@@ -40,6 +40,7 @@ public class UserService
 		{
 			_logger.Debug("Register User - Successfully registered user");
 			_logger.Debug("Adding default user stats");
+			// in theory, we could just add the id since it has default values but i like doing it this way
 			var addUserStatsSuccessful = _userRepository.AddUserStats(new UserStats()
 			{
 				Id = registerSuccessful,
@@ -155,5 +156,45 @@ public class UserService
 	{
 		var userStats = _userRepository.GetUserStats(handler);
 		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), Helper.APPL_JSON);
+	}
+
+	public Result GetScoreboard(Handler handler)
+	{
+		var allStats = _userRepository.GetAllStats();
+		if (allStats.Count == 0)
+		{
+			return new Result(true, "No stats found");
+		}
+
+		List<ScoreboardUser> scoreboard = [];
+
+		foreach (var stat in allStats)
+		{
+			var user = _userRepository.GetUserById(stat.Id);
+			if (user == null)
+			{
+				return new Result(false, "Error while getting user data");
+			}
+			scoreboard.Add(new ScoreboardUser()
+			{
+				Id = stat.Id,
+				Username = user.Username,
+				Elo = stat.Elo,
+				Wins = stat.Wins,
+				Losses = stat.Losses,
+				Draws = stat.Draws
+			});
+		}
+
+		// in theory i could sort the list when getting it from the db but i like doing it like this
+		var sortedScoreboardUsers = scoreboard.OrderByDescending(scoreboardUser => scoreboardUser.Elo).ToList();
+
+		if (handler.QueryParams.Any(param => param is { Key: "format", Value: "plain" }))
+		{
+			var finalText = Helper.GenerateScoreboardTable(sortedScoreboardUsers);
+			return new Result(true, finalText, Helper.TEXT_PLAIN);
+		}
+
+		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), Helper.APPL_JSON);
 	}
 }
