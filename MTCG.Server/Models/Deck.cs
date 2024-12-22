@@ -2,5 +2,5 @@
 
 public class Deck
 {
-	public List<Card> Cards;
+	public List<Card>? Cards;
 }
