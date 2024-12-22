@@ -3,7 +3,10 @@ using System.Text.Json;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Util;
+using MTCG.Server.Util.BattleRules;
+using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
+using BattleResult = MTCG.Server.Models.BattleResult;
 
 namespace MTCG.Server.Services;
 
@@ -14,7 +17,7 @@ public class BattleService
 
 	public async Task<Result> WaitForBattleAsync(Handler handler, TimeSpan timeout, DeckService deckService, CardService cardService)
 	{
-		var currentUserDeckResult = deckService.GetDeckForCurrentUser(handler);
+		var currentUserDeckResult = deckService.GetDeckForCurrentUser(handler, true);
 		var deserializedDeck = new Deck()
 		{
 			Cards = JsonSerializer.Deserialize<List<Card>>(currentUserDeckResult.Message)
@@ -62,11 +65,11 @@ public class BattleService
 	private void DoBattle((Handler, TaskCompletionSource<Result>) player1, (Handler, TaskCompletionSource<Result>) player2, DeckService deckService)
 	{
 		// TODO: maybe lock decks so it cannot be edited?
-		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1).Message);
+		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1, true).Message);
 		var player1DeckBackupCopy = new List<Card>(player1DeckCards);
-		var player2DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player2.Item1).Message);
+		var player2DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player2.Item1, true).Message);
 		var player2DeckBackupCopy = new List<Card>(player2DeckCards);
-		var battleLog = new List<string>();
+		var battleLog = new List<BattleLogEntry>();
 
 		if (player1DeckCards is not { Count: 4 } || player2DeckCards is not { Count: 4 })
 		{
@@ -83,45 +86,76 @@ public class BattleService
 			var player1Card = DrawRandomCardFromDeck(player1DeckCards);
 			var player2Card = DrawRandomCardFromDeck(player2DeckCards);
 
-			var (winner, log) = FightRound(player1Card, player2Card);
-			battleLog.Add($"Round {roundCount}: {log}");
+			var (winner, logMessage) = FightRound(player1Card, player2Card);
+
+			var logEntry = new BattleLogEntry()
+			{
+				Round = roundCount,
+				Player1 = player1.Item1.AuthorizedUser.Username,
+				Player2 = player2.Item1.AuthorizedUser.Username,
+				Card1 = player1Card,
+				Card2 = player2Card,
+				Message = logMessage
+			};
 
 			if (winner == player1Card)
 			{
+				logEntry.Result = BattleLogResult.PLAYER_1_WIN;
 				player2DeckCards.Remove(player2Card);
 				player1DeckCards.Add(player2Card);
 			}
 			else if (winner == player2Card)
 			{
+				logEntry.Result = BattleLogResult.PLAYER_2_WIN;
 				player1DeckCards.Remove(player1Card);
 				player2DeckCards.Add(player1Card);
 			}
+			else
+			{
+				logEntry.Result = BattleLogResult.DRAW;
+			}
+			battleLog.Add(logEntry);
 		}
 
 		if (player1DeckCards.Any() && !player2DeckCards.Any())
 		{
-			battleLog.Add($"{player1.Item1.AuthorizedUser.Username} wins!");
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.WIN, battleLog);
-			player1.Item2.SetResult(new Result(true, JsonSerializer.Serialize(player1BattleResult)));
+			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
 			var player2BattleResult = new BattleResult(Util.Enums.BattleResult.LOSE, battleLog);
-			player2.Item2.SetResult(new Result(true, JsonSerializer.Serialize(player2BattleResult)));
+			player2.Item2.SetResult(GetResult(player2.Item1, player2BattleResult));
 
 		}
 		else if (player2DeckCards.Any() && !player1DeckCards.Any())
 		{
-			battleLog.Add($"{player2.Item1.AuthorizedUser.Username} wins!");
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.LOSE, battleLog);
-			player1.Item2.SetResult(new Result(true, JsonSerializer.Serialize(player1BattleResult)));
+			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
 			var player2BattleResult = new BattleResult(Util.Enums.BattleResult.WIN, battleLog);
-			player2.Item2.SetResult(new Result(true, JsonSerializer.Serialize(player2BattleResult)));
+			player2.Item2.SetResult(GetResult(player2.Item1, player2BattleResult));
 		}
 		else
 		{
-			battleLog.Add("Draw after 100 rounds!");
 			var gameBattleResult = new BattleResult(Util.Enums.BattleResult.DRAW, battleLog);
-			player1.Item2.SetResult(new Result(true, JsonSerializer.Serialize(gameBattleResult)));
-			player2.Item2.SetResult(new Result(true, JsonSerializer.Serialize(gameBattleResult)));
+			player1.Item2.SetResult(GetResult(player1.Item1, gameBattleResult));
+			player2.Item2.SetResult(GetResult(player2.Item1, gameBattleResult));
 		}
+	}
+
+	private Result GetResult(Handler handler, BattleResult result)
+	{
+		if (!handler.HasPlainFormat()) return new Result(true, JsonSerializer.Serialize(result), Helper.APPL_JSON);
+
+		var logTable = result.GenerateBattleLogTable();
+
+		if (result.Result == Util.Enums.BattleResult.DRAW)
+		{
+			logTable += "\nDraw after 100 rounds!";
+		}
+		else
+		{
+			logTable += $"\nYou {result.Result}!";
+		}
+				
+		return new Result(true, logTable, Helper.TEXT_PLAIN);
 	}
 
 	private static Card DrawRandomCardFromDeck(List<Card> deck)
@@ -131,10 +165,20 @@ public class BattleService
 		return deck[randomIndex];
 	}
 
-	private (Card Winner, string Log) FightRound(Card card1, Card card2)
+	private (Card? Winner, string Log) FightRound(Card card1, Card card2)
 	{
-		return (card1, "");
-	}
+		if (BattleRules.Apply(card1, card2, out SpecialRuleResult winner))
+		{
+			return (winner.Winner, winner.LogMessage);
+		}
 
-	private static bool SpecialRelationsApply
+		var log = $"{card1.Name} (Dmg: {card1.Damage}) vs {card2.Name} (Dmg: {card2.Damage})";
+
+		if (card1.Damage > card2.Damage)
+		{
+			return (card1, log += $" - {card1.Name} Wins!");
+		}
+
+		return card2.Damage > card1.Damage ? (card2, log += $" - {card2.Name} Wins!") : (null, log + " - Draw!");
+	}
 }

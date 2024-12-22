@@ -128,7 +128,7 @@ public class Router
 						var getPackageResult = _transactionService.GetRandomPackageForUser(handler);
 						handler.Reply(getPackageResult.Success ? 200 : 400, getPackageResult.Message, getPackageResult.ContentType);
 						break;
-					case "/battles":
+					case { } s when s.StartsWith("/battles"):
 						_logger.Debug("Routing POST /battles");
 						if (!Helper.IsUserAuthorized(handler))
 						{

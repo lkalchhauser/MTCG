@@ -189,7 +189,7 @@ public class UserService
 		// in theory i could sort the list when getting it from the db but i like doing it like this
 		var sortedScoreboardUsers = scoreboard.OrderByDescending(scoreboardUser => scoreboardUser.Elo).ToList();
 
-		if (handler.QueryParams.Any(param => param is { Key: "format", Value: "plain" }))
+		if (handler.HasPlainFormat())
 		{
 			var finalText = Helper.GenerateScoreboardTable(sortedScoreboardUsers);
 			return new Result(true, finalText, Helper.TEXT_PLAIN);

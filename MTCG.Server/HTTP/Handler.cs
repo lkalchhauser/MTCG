@@ -159,4 +159,9 @@ public class Handler
 		}
 		return "";
 	}
+
+	public bool HasPlainFormat()
+	{
+		return QueryParams.Any(param => param is { Key: "format", Value: "plain" });
+	}
 }

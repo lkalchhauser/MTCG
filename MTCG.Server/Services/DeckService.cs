@@ -14,7 +14,7 @@ public class DeckService
 	private CardRepository _cardRepository = new CardRepository();
 
 	// currently we only allow one of each card per deck and one deck per user
-	public Result GetDeckForCurrentUser(Handler handler)
+	public Result GetDeckForCurrentUser(Handler handler, bool forceJsonFormat = false)
 	{
 		_logger.Debug($"Getting current deck for user {handler.AuthorizedUser.Username}");
 		var deckId = _deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
@@ -37,7 +37,7 @@ public class DeckService
 		var serializedDeckCards = JsonSerializer.Serialize(deck.Cards);
 		_logger.Debug($"Current deck for user {handler.AuthorizedUser.Username} is: {serializedDeckCards}");
 
-		if (handler.QueryParams.Any(param => param is { Key: "format", Value: "plain" }))
+		if (handler.HasPlainFormat() && !forceJsonFormat)
 		{
 			var finalText = deck.Cards.Aggregate("", (current, deckCard) => current + (deckCard + "\n"));
 			return new Result(true, finalText, Helper.TEXT_PLAIN);

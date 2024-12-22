@@ -92,5 +92,4 @@ public class Helper
 		var finalTable = $"{headerRow}\n{separatorRow}\n{string.Join("\n", rows)}";
 		return finalTable;
 	}
-
 }
