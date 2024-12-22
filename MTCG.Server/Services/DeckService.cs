@@ -115,6 +115,11 @@ public class DeckService
 		_deckRepository.DeleteDeckById(deckId);
 	}
 
+	public void DeleteDeckAndCardsFromUser(int deckId, UserCredentials user, List<Card> currentDeck)
+	{
+		// TODO: this is not implemented yet
+	}
+
 	public bool IsCardAvailableForUser(Card card, UserCredentials user, List<Card> currentDeck)
 	{
 		var currentAmount = 0;

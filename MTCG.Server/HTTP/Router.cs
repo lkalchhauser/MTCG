@@ -136,7 +136,7 @@ public class Router
 							break;
 						}
 
-						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1), _deckService);
+						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1), _deckService, _cardService);
 						handler.Reply(battleRequestResult.Success ? 200 : 408, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
 					case "/tradings":

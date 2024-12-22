@@ -12,7 +12,7 @@ public class BattleService
 	private readonly ConcurrentQueue<(Handler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
 
 
-	public async Task<Result> WaitForBattleAsync(Handler handler, TimeSpan timeout, DeckService deckService)
+	public async Task<Result> WaitForBattleAsync(Handler handler, TimeSpan timeout, DeckService deckService, CardService cardService)
 	{
 		var currentUserDeckResult = deckService.GetDeckForCurrentUser(handler);
 		var deserializedDeck = new Deck()
@@ -61,6 +61,7 @@ public class BattleService
 	// TODO: when setting the deck after win/lose, add the new cards to user stack and not deck
 	private void DoBattle((Handler, TaskCompletionSource<Result>) player1, (Handler, TaskCompletionSource<Result>) player2, DeckService deckService)
 	{
+		// TODO: maybe lock decks so it cannot be edited?
 		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1).Message);
 		var player1DeckBackupCopy = new List<Card>(player1DeckCards);
 		var player2DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player2.Item1).Message);
@@ -134,4 +135,6 @@ public class BattleService
 	{
 		return (card1, "");
 	}
+
+	private static bool SpecialRelationsApply
 }

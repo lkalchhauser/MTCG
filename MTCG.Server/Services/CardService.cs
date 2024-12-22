@@ -60,6 +60,16 @@ public class CardService
 		return new Result(true, "Package successfully added!");
 	}
 
+	public bool AddCardsToUserStack(int userId, List<Card> cards)
+	{
+		foreach (var card in cards)
+		{
+			AddCardToUserStack(userId, card.Id);
+		}
+		// TODO: not best return value
+		return true;
+	}
+
 	public bool AddCardToUserStack(int userId, int cardId)
 	{
 		var relation = _cardRepository.GetUserCardRelation(userId, cardId);
