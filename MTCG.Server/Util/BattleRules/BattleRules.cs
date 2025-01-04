@@ -13,6 +13,7 @@ public static class BattleRules
 		new GoblinFearsDragonRule(),
 		new KnightDrownsByWaterSpellRule(),
 		new FireElvesCanEvadeDragonRule(),
+		new SlimeInvincibleAgainstOniRule(),
 		new ElementEffectivenessRule()
 	];
 

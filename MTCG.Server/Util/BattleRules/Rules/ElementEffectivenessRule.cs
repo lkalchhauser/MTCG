@@ -19,8 +19,8 @@ public class ElementEffectivenessRule : IBattleRule
 		if (card1.Type == CardType.SPELL)
 		{
 			card1AgainstCard2Multiplier = ElementEffectiveness.GetEffectivenessMultiplier(card1.Element, card2.Element);
-		}
-		if (card2.Type == CardType.SPELL)
+			// we use else if here so the multiplier is not applied in both directions if both cards are spells
+		}  else if (card2.Type == CardType.SPELL)
 		{
 			card2AgainstCard1Multiplier = ElementEffectiveness.GetEffectivenessMultiplier(card2.Element, card1.Element);
 		}
