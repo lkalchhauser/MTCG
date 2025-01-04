@@ -4,5 +4,5 @@ public enum TradeStatus
 {
 	ACTIVE,
 	ACCEPTED,
-	REVOKED
+	DELETED
 }

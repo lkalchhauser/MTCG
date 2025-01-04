@@ -77,11 +77,11 @@ public class Server
 		services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 		services.AddScoped<IUserService, UserService>();
-		services.AddScoped<BattleService>();
-		services.AddScoped<CardService>();
-		services.AddScoped<DeckService>();
-		services.AddScoped<TradeService>();
-		services.AddScoped<TransactionService>();
+		services.AddScoped<IBattleService, BattleService>();
+		services.AddScoped<ICardService, CardService>();
+		services.AddScoped<IDeckService, DeckService>();
+		services.AddScoped<ITradeService, TradeService>();
+		services.AddScoped<ITransactionService, TransactionService>();
 		
 		services.AddScoped<IHelperService, HelperService>();
 		services.AddScoped<IHandler, Handler>();

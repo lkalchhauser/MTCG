@@ -7,4 +7,6 @@ public interface ITradeService
 {
 	public Result CreateTradeOffer(IHandler handler);
 	public Result GetCurrentlyActiveTrades(IHandler handler);
+	public Result DeleteTrade(IHandler handler);
+	public Result AcceptTradeOffer(IHandler handler);
 }

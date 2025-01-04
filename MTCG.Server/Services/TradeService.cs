@@ -14,7 +14,8 @@ public class TradeService(
 	ITradeRepository tradeRepository,
 	ICardRepository cardRepository,
 	IUserRepository userRepository,
-	ICardService cardService)
+	ICardService cardService,
+	IDeckService deckService)
 	: ITradeService
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -72,10 +73,184 @@ public class TradeService(
 		return !handler.HasPlainFormat() ? new Result(true, JsonSerializer.Serialize(currentTrades), HelperService.APPL_JSON) : new Result(true, GenerateTradeTable(currentTrades), HelperService.TEXT_PLAIN);
 	}
 
+	public Result DeleteTrade(IHandler handler)
+	{
+		int.TryParse(handler.Path.Split("/").Last(), out var tradingId);
+		var trade = tradeRepository.GetTradeById(tradingId);
+
+		if (trade == null)
+		{
+			_logger.Debug("DeleteTrade - Trade not found");
+			return new Result(false, "Trade not found!");
+		}
+
+		if (!trade.UserId.Equals(handler.AuthorizedUser.Id))
+		{
+			_logger.Debug("DeleteTrade - User is not owner of the trade!");
+			return new Result(false, "User is not owner of the trade!");
+		}
+
+		if (trade.Status != TradeStatus.ACTIVE)
+		{
+			_logger.Debug("DeleteTrade - Trade is not active");
+			return new Result(false, "Trade is not active!");
+		}
+
+		trade.Status = TradeStatus.DELETED;
+		var tradeDeleted = tradeRepository.UpdateTrade(trade);
+		if (!tradeDeleted)
+		{
+			_logger.Debug("DeleteTrade - Failed to delete trade");
+			return new Result(false, "Failed to delete trade!");
+		}
+
+		return new Result(true, "Trade successfully deleted!");
+	}
+
+	public Result AcceptTradeOffer(IHandler handler)
+	{
+		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
+		{
+			_logger.Debug("AcceptTradeOffer - No valid payload data found");
+			return new Result(false, "Badly formatted data sent!");
+		}
+
+		var tradeAccept = JsonSerializer.Deserialize<TradeAcceptRequest>(handler.Payload);
+
+		int.TryParse(handler.Path.Split("/").Last(), out var tradingId);
+		var trade = tradeRepository.GetTradeById(tradingId);
+
+		if (trade == null)
+		{
+			_logger.Debug("DeleteTrade - Trade not found");
+			return new Result(false, "Trade not found!");
+		}
+
+		if (trade.UserId.Equals(handler.AuthorizedUser.Id))
+		{
+			_logger.Debug("AcceptTrade - user tried to trade with themselves!");
+			return new Result(false, "You cannot trade with yourself!");
+		}
+
+		if (trade.Status != TradeStatus.ACTIVE)
+		{
+			_logger.Debug("DeleteTrade - Trade is not active");
+			return new Result(false, "Trade is not active!");
+		}
+
+		
+
+		
+		var acceptCard = cardRepository.GetCardByUuid(tradeAccept?.UUID);
+
+		if (acceptCard == null)
+		{
+			_logger.Debug("AcceptTrade - Card not found");
+			return new Result(false, "Card not found!");
+		}
+
+		if (!cardService.IsCardAvailableForUser(acceptCard.Id, handler.AuthorizedUser.Id))
+		{
+			_logger.Debug("AcceptTrade - Card is not available!");
+			return new Result(false, "Card is not available!");
+		}
+
+		var isValidTradeResult = IsCardValidToTrade(trade, acceptCard);
+
+		if (!isValidTradeResult.Success)
+		{
+			return new Result(false, isValidTradeResult.Message);
+		}
+
+		var offerCard = cardRepository.GetCardById(trade.CardId);
+
+		cardService.RemoveCardFromUserStack(handler.AuthorizedUser.Id, acceptCard.Id);
+		cardService.UnlockCardInUserStack(trade.UserId, trade.CardId);
+		cardService.RemoveCardFromUserStack(trade.UserId, trade.CardId);
+		cardService.AddCardToUserStack(handler.AuthorizedUser.Id, offerCard.Id);
+		cardService.AddCardToUserStack(trade.UserId, acceptCard.Id);
+
+		trade.Status = TradeStatus.ACCEPTED;
+		var tradeUpdated = tradeRepository.UpdateTrade(trade);
+
+		var tradeAcceptObject = new TradeAccept()
+		{
+			AcceptedUserId = handler.AuthorizedUser.Id,
+			TradeId = trade.Id,
+			ProvidedCardId = acceptCard.Id
+		};
+
+		var tradeAcceptLog = tradeRepository.AddTradeAcceptEntry(handler, tradeAcceptObject);
+
+		if (!tradeUpdated)
+		{
+			_logger.Debug("AcceptTrade - Failed to update trade");
+			return new Result(false, "Failed to update trade!");
+		}
+
+		if (!tradeAcceptLog)
+		{
+			_logger.Debug("AcceptTrade - Failed to log trade accept");
+			return new Result(false, "Failed to log trade accept!");
+		}
+
+		return new Result(true, "Trade successfully accepted!");
+	}
+
+	private Result IsCardValidToTrade(TradeOffer offer, Card acceptCard)
+	{
+		if (offer.DesiredCardType != null)
+		{
+			if (offer.DesiredCardType != acceptCard.Type)
+			{
+				return new Result(false, "Card type does not match!");
+			}
+		}
+
+		if (offer.DesiredCardRarity != null)
+		{
+			// TODO: maybe accept any card higher than the rarity?
+			if (offer.DesiredCardRarity != acceptCard.Rarity)
+			{
+				return new Result(false, "Card rarity does not match!");
+			}
+		}
+
+		if (offer.DesiredCardRace != null)
+		{
+			if (offer.DesiredCardRace != acceptCard.Race)
+			{
+				return new Result(false, "Card race does not match!");
+			}
+		}
+
+		if (offer.DesiredCardElement != null)
+		{
+			if (offer.DesiredCardElement != acceptCard.Element)
+			{
+				return new Result(false, "Card element does not match!");
+			}
+		}
+
+		if (offer.DesiredCardMinimumDamage != null)
+		{
+			if (offer.DesiredCardMinimumDamage > acceptCard.Damage)
+			{
+				return new Result(false, "Card damage is too low!");
+			}
+		}
+
+		return new Result(true, "Trade is valid!");
+	}
+
 	private string GenerateTradeTable(List<TradeOffer> tradeOffers)
 	{
-		var headers = new[] { "Id", "Card", "User", "Desired Type", " Desired Rarity", "Desired Race", "Desired Element", "Desired Minimum Damage" };
+		if (tradeOffers.Count == 0)
+		{
+			return "No trades found!";
+		}
 
+		var headers = new[] { "Id", "Card", "User", "Desired Type", " Desired Rarity", "Desired Race", "Desired Element", "Desired Minimum Damage" };
 		var idWidth = Math.Max(headers[0].Length, tradeOffers.Max(e => e.Id.ToString().Length));
 		//var cardIdWidth = Math.Max(headers[1].Length, tradeOffers.Max(e => e.CardId.ToString().Length));
 		//var userIdWidth = Math.Max(headers[2].Length, tradeOffers.Max(e => e.UserId.ToString().Length));

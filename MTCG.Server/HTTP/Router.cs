@@ -15,14 +15,14 @@ public class Router
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	private readonly IUserService _userService;
-	private readonly CardService _cardService;
-	private readonly TransactionService _transactionService;
-	private readonly DeckService _deckService;
-	private readonly BattleService _battleService;
-	private readonly TradeService _tradingService;
+	private readonly ICardService _cardService;
+	private readonly ITransactionService _transactionService;
+	private readonly IDeckService _deckService;
+	private readonly IBattleService _battleService;
+	private readonly ITradeService _tradingService;
 	private readonly IHelperService _helperService;
 
-	public Router(IUserService userService, CardService cardService, TransactionService transactionService, DeckService deckService, BattleService battleService, TradeService tradingService, IHelperService helperService)
+	public Router(IUserService userService, ICardService cardService, ITransactionService transactionService, IDeckService deckService, IBattleService battleService, ITradeService tradingService, IHelperService helperService)
 	{
 		_userService = userService;
 		_cardService = cardService;
@@ -155,6 +155,16 @@ public class Router
 						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1), _deckService, _cardService);
 						handler.Reply(battleRequestResult.Success ? 200 : 408, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
+					case { } s when s.StartsWith("/tradings/"):
+						_logger.Debug("Routing POST /tradings/");
+						if (!_userService.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var acceptTradingOffer = _tradingService.AcceptTradeOffer(handler);
+						handler.Reply(acceptTradingOffer.Success ? 200 : 400, acceptTradingOffer.Message, acceptTradingOffer.ContentType);
+						break;
 					case "/tradings":
 						_logger.Debug("Routing POST /tradings");
 						if (!_userService.IsUserAuthorized(handler))
@@ -208,8 +218,6 @@ public class Router
 						break;
 				}
 				break;
-
-			// deck
 			case "DELETE":
 				switch (handler.Path)
 				{
@@ -222,6 +230,16 @@ public class Router
 						}
 						var deleteUserInfoResult = _userService.DeleteUserInfo(handler);
 						handler.Reply(deleteUserInfoResult.Success ? 200 : 400, deleteUserInfoResult.Message, deleteUserInfoResult.ContentType);
+						break;
+					case { } s when s.StartsWith("/tradings/"):
+						_logger.Debug("Routing DELETE /tradings/");
+						if (!_userService.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var deleteTradeResult = _tradingService.DeleteTrade(handler);
+						handler.Reply(deleteTradeResult.Success ? 200 : 400, deleteTradeResult.Message, deleteTradeResult.ContentType);
 						break;
 				}
 				// tradings/{tradingdealid}

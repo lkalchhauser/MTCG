@@ -189,4 +189,10 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 
 		return new Result(true, JsonSerializer.Serialize(cards), HelperService.APPL_JSON);
 	}
+
+	public bool IsCardAvailableForUser (int cardId, int userId)
+	{
+		var relation = cardRepository.GetUserCardRelation(userId, cardId);
+		return relation != null && relation.Quantity > relation.LockedAmount;
+	}
 }

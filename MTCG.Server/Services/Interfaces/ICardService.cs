@@ -15,4 +15,5 @@ public interface ICardService
 	public bool LockCardInUserStack(int userId, int cardId);
 	public bool UnlockCardInUserStack(int userId, int cardId);
 	public Result ShowAllCardsForUser(IHandler handler);
+	public bool IsCardAvailableForUser(int cardId, int userId);
 }

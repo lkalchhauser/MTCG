@@ -5,6 +5,6 @@ namespace MTCG.Server.Services.Interfaces;
 
 public interface IBattleService
 {
-	public Task<Result> WaitForBattleAsync(IHandler handler, TimeSpan timeout, DeckService deckService,
-		CardService cardService);
+	public Task<Result> WaitForBattleAsync(IHandler handler, TimeSpan timeout, IDeckService deckService,
+		ICardService cardService);
 }

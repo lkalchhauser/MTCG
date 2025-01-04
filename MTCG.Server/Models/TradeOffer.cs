@@ -12,5 +12,6 @@ public class TradeOffer
 	public Rarity? DesiredCardRarity { get; set; } = null;
 	public Race? DesiredCardRace { get; set; } = null;
 	public Element? DesiredCardElement { get; set; } = null;
-	public float? DesiredCardMinimumDamage { get; set; } = null;
+	public float? DesiredCardMinimumDamage { get; set; } = 0;
+	public TradeStatus? Status { get; set; } = null;
 }
