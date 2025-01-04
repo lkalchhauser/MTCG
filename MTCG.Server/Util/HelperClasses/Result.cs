@@ -9,7 +9,7 @@ public class Result
 
 	// TODO: Add more properties if needed - token is theoretically not needed but would be better if tokens are replied properly
 	// TODO: also maybe add a status code to the result - so we can do it like said in the yaml doc
-	public Result(bool success, string message, string contentType = Helper.TEXT_PLAIN)
+	public Result(bool success, string message, string contentType = HelperService.TEXT_PLAIN)
 	{
 		Success = success;
 		Message = message;

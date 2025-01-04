@@ -2,6 +2,7 @@
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
@@ -11,15 +12,23 @@ namespace MTCG.Server.Services;
 public class TradeService
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private TradeRepository _tradeRepository = new TradeRepository();
-	private CardRepository _cardRepository = new CardRepository();
-	private UserRepository _userRepository = new UserRepository();
+	private readonly ITradeRepository _tradeRepository;
+	private readonly ICardRepository _cardRepository;
+	private readonly IUserRepository _userRepository;
 	// TODO: übergeben
-	private CardService _cardService = new CardService();
+	private readonly CardService _cardService;
 
-	public Result CreateTradeOffer(Handler handler)
+	public TradeService(ITradeRepository tradeRepository, ICardRepository cardRepository, IUserRepository userRepository, CardService cardService)
 	{
-		if (handler.GetContentType() != Helper.APPL_JSON || handler.Payload == null)
+		_tradeRepository = tradeRepository;
+		_cardRepository = cardRepository;
+		_userRepository = userRepository;
+		_cardService = cardService;
+	}
+
+	public Result CreateTradeOffer(IHandler handler)
+	{
+		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
 		{
 			_logger.Debug("CreateTradeOffer - No valid payload data found");
 			return new Result(false, "Badly formatted data sent!");
@@ -58,7 +67,7 @@ public class TradeService
 	}
 
 
-	public Result GetCurrentlyActiveTrades(Handler handler)
+	public Result GetCurrentlyActiveTrades(IHandler handler)
 	{
 		var currentTrades = _tradeRepository.GetAllTradesWithStatus(TradeStatus.ACTIVE);
 		if (currentTrades == null)
@@ -67,7 +76,7 @@ public class TradeService
 			return new Result(true, "No trades found!");
 		}
 
-		return !handler.HasPlainFormat() ? new Result(true, JsonSerializer.Serialize(currentTrades), Helper.APPL_JSON) : new Result(true, GenerateTradeTable(currentTrades), Helper.TEXT_PLAIN);
+		return !handler.HasPlainFormat() ? new Result(true, JsonSerializer.Serialize(currentTrades), HelperService.APPL_JSON) : new Result(true, GenerateTradeTable(currentTrades), HelperService.TEXT_PLAIN);
 	}
 
 	private string GenerateTradeTable(List<TradeOffer> tradeOffers)

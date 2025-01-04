@@ -2,6 +2,7 @@
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
@@ -10,11 +11,17 @@ namespace MTCG.Server.Services;
 public class DeckService
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private DeckRepository _deckRepository = new DeckRepository();
-	private CardRepository _cardRepository = new CardRepository();
+	private readonly IDeckRepository _deckRepository;
+	private readonly ICardRepository _cardRepository;
+
+	public DeckService(IDeckRepository deckRepository, ICardRepository cardRepository)
+	{
+		_deckRepository = deckRepository;
+		_cardRepository = cardRepository;
+	}
 
 	// currently we only allow one of each card per deck and one deck per user
-	public Result GetDeckForCurrentUser(Handler handler, bool forceJsonFormat = false)
+	public Result GetDeckForCurrentUser(IHandler handler, bool forceJsonFormat = false)
 	{
 		_logger.Debug($"Getting current deck for user {handler.AuthorizedUser.Username}");
 		var deckId = _deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
@@ -40,16 +47,16 @@ public class DeckService
 		if (handler.HasPlainFormat() && !forceJsonFormat)
 		{
 			var finalText = deck.Cards.Aggregate("", (current, deckCard) => current + (deckCard + "\n"));
-			return new Result(true, finalText, Helper.TEXT_PLAIN);
+			return new Result(true, finalText, HelperService.TEXT_PLAIN);
 		}
-		return new Result(true, serializedDeckCards, Helper.APPL_JSON);
+		return new Result(true, serializedDeckCards, HelperService.APPL_JSON);
 	}
 
 	// all of this currently only works if there is only one of each card per package
-	public Result SetDeckForCurrentUser(Handler handler)
+	public Result SetDeckForCurrentUser(IHandler handler)
 	{
 		_logger.Debug($"Setting deck for user {handler.AuthorizedUser.Username}");
-		if (handler.GetContentType() != Helper.APPL_JSON || handler.Payload == null)
+		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
 		{
 			_logger.Debug("SetDeckForCurrentUser - No valid payload data found");
 			return new Result(false, "Badly formatted data sent!");

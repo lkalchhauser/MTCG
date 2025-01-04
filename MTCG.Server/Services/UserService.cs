@@ -2,17 +2,26 @@
 using MTCG.Server.Models;
 using System.Text.Json;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class UserService
+public class UserService : IUserService
 {
-	private UserRepository _userRepository = new UserRepository();
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private readonly IUserRepository _userRepository;
+	private readonly IHelperService _helperService;
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public Result RegisterUser(Handler handler)
+	public UserService(IUserRepository userRepository, IHelperService helperService)
+	{
+		_userRepository = userRepository;
+		_helperService = helperService;
+	}
+
+	public Result RegisterUser(IHandler handler)
 	{
 		_logger.Debug("Register User - Registering user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -30,7 +39,7 @@ public class UserService
 			return new Result(false, "User already exists!");
 		}
 		
-		var hashedPassword = Helper.HashPassword(credentials.Password);
+		var hashedPassword = _helperService.HashPassword(credentials.Password);
 
 		credentials.Password = hashedPassword;
 
@@ -60,7 +69,7 @@ public class UserService
 		return new Result(false, "Registration failed!");
 	}
 
-	public Result LoginUser(Handler handler)
+	public Result LoginUser(IHandler handler)
 	{
 		_logger.Debug("Login User - Logging in user...");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -78,14 +87,14 @@ public class UserService
 			return new Result(false, "Login failed - User does not exist");
 		}
 
-		if (!Helper.VerifyPassword(credentials.Password, userFromDb.Password))
+		if (!_helperService.VerifyPassword(credentials.Password, userFromDb.Password))
 		{
 			_logger.Debug("Password invalid! - Invalid Password");
 			return new Result(false, "Login failed - Login Data not correct");
 		}
 
 		_logger.Debug("Password valid! Generating token...");
-		userFromDb.Token = Helper.GenerateToken(credentials.Username);
+		userFromDb.Token = _helperService.GenerateToken(credentials.Username);
 		_logger.Debug("Saving token into DB...");
 		var userUpdateSuccessful = _userRepository.UpdateUser(userFromDb);
 
@@ -100,7 +109,7 @@ public class UserService
 		var tokenStringified = JsonSerializer.Serialize(temp);
 
 		_logger.Debug("Login User - Successfully logged in user");
-		return new Result(true, tokenStringified, Helper.APPL_JSON);
+		return new Result(true, tokenStringified, HelperService.APPL_JSON);
 	}
 
 	public UserCredentials? GetAuthorizedUserWithToken(string token)
@@ -108,7 +117,7 @@ public class UserService
 		return _userRepository.GetUserByToken(token);
 	}
 
-	public Result GetUserInformationForUser(Handler handler)
+	public Result GetUserInformationForUser(IHandler handler)
 	{
 		var userInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 		if (userInfo == null)
@@ -117,10 +126,21 @@ public class UserService
 			return new Result(false, "Failed to get user information - no data found");
 		}
 		_logger.Debug($"Successfully got user information: {JsonSerializer.Serialize(userInfo)}");
-		return new Result(true, JsonSerializer.Serialize(userInfo), Helper.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(userInfo), HelperService.APPL_JSON);
 	}
 
-	public Result AddOrUpdateUserInfo(Handler handler)
+	public bool IsUserAuthorized(IHandler handler)
+	{
+		var authUser = GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
+		if (authUser == null)
+		{
+			return false;
+		}
+		handler.AuthorizedUser = authUser;
+		return true;
+	}
+
+	public Result AddOrUpdateUserInfo(IHandler handler)
 	{
 		if (handler.Payload == null)
 		{
@@ -134,14 +154,14 @@ public class UserService
 		if (getExistingUserInfo == null)
 		{
 			var addUserInfoSuccessful = _userRepository.AddUserInfo(newUserInfo);
-			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), Helper.APPL_JSON) : new Result(false, "Error while adding info to database");
+			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
 		}
 		
 		var updateUserInfoSuccessful = _userRepository.UpdateUserInfo(newUserInfo);
-		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), Helper.APPL_JSON) : new Result(false, "Error while adding info to database");
+		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
 	}
 
-	public Result DeleteUserInfo(Handler handler)
+	public Result DeleteUserInfo(IHandler handler)
 	{
 		var existingUserInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 		if (existingUserInfo == null)
@@ -152,19 +172,19 @@ public class UserService
 		return userInfoDeleted ? new Result(true, "User info successfully deleted") : new Result(false, "Error while deleting user info");
 	}
 
-	public Result GetUserStats(Handler handler)
+	public Result GetUserStats(IHandler handler)
 	{
 		var userStats = _userRepository.GetUserStats(handler);
-		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), Helper.APPL_JSON);
+		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), HelperService.APPL_JSON);
 	}
 
-	public Result UpdateUserStats(Handler handler, UserStats userStats)
+	public Result UpdateUserStats(IHandler handler, UserStats userStats)
 	{
 		var updateSuccessful = _userRepository.UpdateUserStats(userStats);
 		return updateSuccessful ? new Result(true, "User stats successfully updated") : new Result(false, "Error while updating user stats");
 	}
 
-	public Result GetScoreboard(Handler handler)
+	public Result GetScoreboard(IHandler handler)
 	{
 		var allStats = _userRepository.GetAllStats();
 		if (allStats.Count == 0)
@@ -197,14 +217,14 @@ public class UserService
 
 		if (handler.HasPlainFormat())
 		{
-			var finalText = Helper.GenerateScoreboardTable(sortedScoreboardUsers);
-			return new Result(true, finalText, Helper.TEXT_PLAIN);
+			var finalText = _helperService.GenerateScoreboardTable(sortedScoreboardUsers);
+			return new Result(true, finalText, HelperService.TEXT_PLAIN);
 		}
 
-		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), Helper.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), HelperService.APPL_JSON);
 	}
 
-	public Result UpdatePassword(Handler handler)
+	public Result UpdatePassword(IHandler handler)
 	{
 		_logger.Debug($"Updating password for user {handler.AuthorizedUser.Username}");
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
@@ -216,7 +236,7 @@ public class UserService
 		// TODO: what if its not valid? -> catch exception?
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
 		var getUserFromDb = _userRepository.GetUserById(handler.AuthorizedUser.Id);
-		getUserFromDb.Password = Helper.HashPassword(credentials.Password);
+		getUserFromDb.Password = _helperService.HashPassword(credentials.Password);
 		getUserFromDb.Token = "";
 		_userRepository.UpdateUser(getUserFromDb);
 		return new Result(true, "Password successfully updated");

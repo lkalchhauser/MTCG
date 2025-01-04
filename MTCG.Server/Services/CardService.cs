@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
@@ -11,11 +12,17 @@ namespace MTCG.Server.Services;
 public class CardService
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private CardRepository _cardRepository = new CardRepository();
-	private PackageRepository _packageRepository = new PackageRepository();
+	private readonly ICardRepository _cardRepository;
+	private readonly IPackageRepository _packageRepository;
+
+	public CardService(ICardRepository cardRepository, IPackageRepository packageRepository)
+	{
+		_cardRepository = cardRepository;
+		_packageRepository = packageRepository;
+	}
 
 	// TODO: maybe move this to packageservice since it's actually the /package path
-	public Result CreatePackageAndCards(Handler handler)
+	public Result CreatePackageAndCards(IHandler handler)
 	{
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
 		{
@@ -155,7 +162,7 @@ public class CardService
 		return true;
 	}
 
-	public Result ShowAllCardsForUser(Handler handler)
+	public Result ShowAllCardsForUser(IHandler handler)
 	{
 		var userCardRelations = _cardRepository.GetAllCardRelationsForUserId(handler.AuthorizedUser.Id);
 		if (userCardRelations.Count == 0)
@@ -186,6 +193,6 @@ public class CardService
 			});
 		}
 
-		return new Result(true, JsonSerializer.Serialize(cards), Helper.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(cards), HelperService.APPL_JSON);
 	}
 }

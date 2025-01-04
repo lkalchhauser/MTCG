@@ -1,12 +1,18 @@
 ﻿using System.Data;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 
 namespace MTCG.Server.Repositories;
 
-public class DeckRepository
+public class DeckRepository : IDeckRepository
 {
-	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
+	private readonly DatabaseConnection _dbConn;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+	public DeckRepository(DatabaseConnection dbConn)
+	{
+		_dbConn = dbConn;
+	}
 
 	public int GetDeckIdFromUserId(int userId)
 	{

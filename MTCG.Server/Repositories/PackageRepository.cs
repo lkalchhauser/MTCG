@@ -1,14 +1,20 @@
 ﻿using System.Data;
 using MTCG.Server.Models;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Repositories;
 
-public class PackageRepository
+public class PackageRepository : IPackageRepository
 {
-	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
+	private readonly DatabaseConnection _dbConn;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+	public PackageRepository(DatabaseConnection dbConn)
+	{
+		_dbConn = dbConn;
+	}
 
 	public bool AddPackage(Package package)
 	{

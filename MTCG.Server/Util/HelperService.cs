@@ -1,5 +1,6 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Util;
@@ -7,31 +8,32 @@ namespace MTCG.Server.Util;
 using BCrypt.Net;
 using MTCG.Server.Services;
 
-public class Helper
+public class HelperService : IHelperService
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private static UserService _userService = new UserService();
-	public static string HashPassword(string password)
+
+
+	public string HashPassword(string password)
 	{
 		_logger.Debug("Hashing password");
 		var hash = BCrypt.HashPassword(password);
 		return hash;
 	}
 
-	public static bool VerifyPassword(string password, string hash)
+	public bool VerifyPassword(string password, string hash)
 	{
 		_logger.Debug("Verifying password");
 		return BCrypt.Verify(password, hash);
 	}
 
-	public static string? GenerateToken(string username)
+	public string? GenerateToken(string username)
 	{
 		_logger.Debug("Generating token");
 		//TODO make this better (for test script it has to stay like this)
 		return $"{username}-mtcgToken";
 	}
 
-	public static Dictionary<int, string> HTTP_CODES = new Dictionary<int, string>() {
+	public Dictionary<int, string> HTTP_CODES = new Dictionary<int, string>() {
 		{200, "OK"},
 		{201, "Created"},
 		{202, "Accepted"},
@@ -45,24 +47,20 @@ public class Helper
 		{500, "Internal Server Error"}
 	};
 
-	public static bool IsUserAuthorized(Handler handler)
+	public Dictionary<int, string> GetHttpCodes()
 	{
-		var authUser = _userService.GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
-		if (authUser == null)
-		{
-			return false;
-		}
-		handler.AuthorizedUser = authUser;
-		return true;
+		return HTTP_CODES;
 	}
 
-	public static bool IsRequestedUserAuthorizedUser(Handler handler)
+
+
+	public bool IsRequestedUserAuthorizedUser(IHandler handler)
 	{
 		var username = ExtractUsernameFromPath(handler.Path);
 		return handler.AuthorizedUser?.Username == username;
 	}
 
-	public static string ExtractUsernameFromPath(string path)
+	public string ExtractUsernameFromPath(string path)
 	{
 		var split = path.Split("/");
 		var username = split[^1];
@@ -73,7 +71,7 @@ public class Helper
 		TEXT_PLAIN = "text/plain",
 		APPL_JSON = "application/json";
 
-	public static string GenerateScoreboardTable(List<ScoreboardUser> sortedScoreboardUsers)
+	public string GenerateScoreboardTable(List<ScoreboardUser> sortedScoreboardUsers)
 	{
 		var headers = new[] { "Username", "Elo", "Wins", "Losses", "Draws" };
 
@@ -94,7 +92,7 @@ public class Helper
 		return finalTable;
 	}
 
-	public static TEnum? ParseEnumOrNull<TEnum>(string value) where TEnum : struct, Enum
+	public TEnum? ParseEnumOrNull<TEnum>(string value) where TEnum : struct, Enum
 	{
 		// Use TryParse to attempt parsing
 		if (Enum.TryParse(value, true, out TEnum result))

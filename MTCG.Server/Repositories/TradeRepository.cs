@@ -1,15 +1,23 @@
 ﻿using System.Data;
 using MTCG.Server.Models;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Repositories;
 
-public class TradeRepository
+public class TradeRepository : ITradeRepository
 {
-	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
+	private readonly DatabaseConnection _dbConn;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private readonly IHelperService _helperService;
+
+	public TradeRepository(DatabaseConnection dbConn, IHelperService helperService)
+	{
+		_dbConn = dbConn;
+		_helperService = helperService;
+	}
 
 	public bool AddTradeOffer(TradeOffer tradeOffer)
 	{
@@ -44,10 +52,10 @@ public class TradeRepository
 				Id = reader.GetInt32(0),
 				UserId = reader.GetInt32(1),
 				CardId = reader.GetInt32(2),
-				DesiredCardType = Helper.ParseEnumOrNull<CardType>(reader.GetString(4)),
-				DesiredCardRarity = Helper.ParseEnumOrNull<Rarity>(reader.GetString(4)),
-				DesiredCardRace = Helper.ParseEnumOrNull<Race>(reader.GetString(5)),
-				DesiredCardElement = Helper.ParseEnumOrNull<Element>(reader.GetString(6)),
+				DesiredCardType = _helperService.ParseEnumOrNull<CardType>(reader.GetString(4)),
+				DesiredCardRarity = _helperService.ParseEnumOrNull<Rarity>(reader.GetString(4)),
+				DesiredCardRace = _helperService.ParseEnumOrNull<Race>(reader.GetString(5)),
+				DesiredCardElement = _helperService.ParseEnumOrNull<Element>(reader.GetString(6)),
 				DesiredCardMinimumDamage = reader.GetInt32(7)
 			});
 		}

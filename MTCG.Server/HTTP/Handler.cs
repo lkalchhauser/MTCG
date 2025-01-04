@@ -8,7 +8,7 @@ using MTCG.Server.Util;
 
 namespace MTCG.Server.HTTP;
 
-public class Handler
+public class Handler : IHandler
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 	public TcpClient Client { get; private set; }
@@ -26,6 +26,12 @@ public class Handler
 	public int StatusCode { get; set; }
 
 	public UserCredentials AuthorizedUser { get; set; }
+	public readonly IHelperService _helperService;
+
+	public Handler(IHelperService helperService)
+	{
+		_helperService = helperService;
+	}
 
 	public async void Handle(TcpClient client)
 	{
@@ -110,12 +116,12 @@ public class Handler
 		}
 	}
 
-	public async void Reply(int statusCode = 200, string? body = null, string? contentType = Helper.TEXT_PLAIN)
+	public async void Reply(int statusCode = 200, string? body = null, string? contentType = HelperService.TEXT_PLAIN)
 	{
 		_logger.Debug("Replying to request");
 		StatusCode = statusCode;
 
-		var response = $"HTTP/1.1 {statusCode} {Helper.HTTP_CODES[statusCode]}\n";
+		var response = $"HTTP/1.1 {statusCode} {_helperService.GetHttpCodes()[statusCode]}\n";
 		if (string.IsNullOrEmpty(body))
 		{
 			response += "Content-Length: 0\n";

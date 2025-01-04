@@ -96,7 +96,7 @@ public class DatabaseConnection
 	//	var pwHash = (string)reader[0];
 	//	reader.Close();
 
-	//	var passwordIsValid = Helper.VerifyPassword(credentials.Password, pwHash);
+	//	var passwordIsValid = HelperService.VerifyPassword(credentials.Password, pwHash);
 
 	//	if (!passwordIsValid)
 	//	{
@@ -106,7 +106,7 @@ public class DatabaseConnection
 	//	}
 	//	_logger.Debug("Password valid!");
 	//	// TODO: currently we re-generate the token every login - do we want this?
-	//	var userToken = Helper.GenerateToken(credentials.Username);
+	//	var userToken = HelperService.GenerateToken(credentials.Username);
 	//	_logger.Debug("Saving token into database");
 	//	var command2 = new NpgsqlCommand($"UPDATE users SET token = '{userToken}' WHERE username = '{credentials.Username}'", _connection);
 	//	command2.ExecuteNonQuery();

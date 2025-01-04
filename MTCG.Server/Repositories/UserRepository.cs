@@ -2,14 +2,20 @@
 using System.Text.Json;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 
 namespace MTCG.Server.Repositories;
 
-public class UserRepository
+public class UserRepository : IUserRepository
 {
-	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
+	private readonly DatabaseConnection _dbConn;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+	public UserRepository(DatabaseConnection dbConn)
+	{
+		_dbConn = dbConn;
+	}
 
 	public UserCredentials? GetUserByUsername(string username)
 	{
@@ -191,7 +197,7 @@ public class UserRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
-	public UserStats? GetUserStats(Handler handler)
+	public UserStats? GetUserStats(IHandler handler)
 	{
 		_logger.Debug($"Trying to get stats from \"{handler.AuthorizedUser.Username}\" from db");
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""

@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using MTCG.Server.Models;
 using MTCG.Server.Services;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 
@@ -13,15 +14,26 @@ namespace MTCG.Server.HTTP;
 public class Router
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly DatabaseConnection _dbConnection = DatabaseConnection.Instance;
-	private UserService _userService = new UserService();
-	private CardService _cardService = new CardService();
-	private TransactionService _transactionService = new TransactionService();
-	private DeckService _deckService = new DeckService();
-	private BattleService _battleService = new BattleService();
-	private TradeService _tradingService = new TradeService();
+	private readonly IUserService _userService;
+	private readonly CardService _cardService;
+	private readonly TransactionService _transactionService;
+	private readonly DeckService _deckService;
+	private readonly BattleService _battleService;
+	private readonly TradeService _tradingService;
+	private readonly IHelperService _helperService;
 
-	public async void HandleIncoming(Handler handler)
+	public Router(IUserService userService, CardService cardService, TransactionService transactionService, DeckService deckService, BattleService battleService, TradeService tradingService, IHelperService helperService)
+	{
+		_userService = userService;
+		_cardService = cardService;
+		_transactionService = transactionService;
+		_deckService = deckService;
+		_battleService = battleService;
+		_tradingService = tradingService;
+		_helperService = helperService;
+	}
+
+	public async void HandleIncoming(IHandler handler)
 	{
 		// COULD CHANGE THIS TO DIFFERENT ENDPOINTS
 		switch (handler.Method)
@@ -35,7 +47,7 @@ public class Router
 						break;
 					case { } s when s.StartsWith("/users/"):
 						_logger.Debug($"Routing GET {s}");
-						if (!Helper.IsUserAuthorized(handler) || !Helper.IsRequestedUserAuthorizedUser(handler))
+						if (!_userService.IsUserAuthorized(handler) || !_helperService.IsRequestedUserAuthorizedUser(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -46,7 +58,7 @@ public class Router
 						break;
 					case "/cards":
 						_logger.Debug("Routing GET /cards");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -57,7 +69,7 @@ public class Router
 						break;
 					case { } s when s.StartsWith("/deck"):
 						_logger.Debug("Routing GET /deck");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -67,7 +79,7 @@ public class Router
 						break;
 					case "/stats":
 						_logger.Debug("Routing GET /stats");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -82,7 +94,7 @@ public class Router
 						break;
 					case "/tradings":
 						_logger.Debug("Routing GET /tradings");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -124,7 +136,7 @@ public class Router
 						break;
 					case "/transactions/packages":
 						_logger.Debug("Routing POST /transactions/packages");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -134,7 +146,7 @@ public class Router
 						break;
 					case { } s when s.StartsWith("/battles"):
 						_logger.Debug("Routing POST /battles");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -145,7 +157,7 @@ public class Router
 						break;
 					case "/tradings":
 						_logger.Debug("Routing POST /tradings");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -164,7 +176,7 @@ public class Router
 				{
 					case "/deck":
 						_logger.Debug("Routing PUT /deck");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -175,7 +187,7 @@ public class Router
 						break;
 					case { } s when s.StartsWith("/users/password"):
 						_logger.Debug($"Routing PUT {handler.Path}");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -185,7 +197,7 @@ public class Router
 						break;
 					case { } s when s.StartsWith("/users/"):
 						_logger.Debug($"Routing PUT {handler.Path}");
-						if (!Helper.IsUserAuthorized(handler) || !Helper.IsRequestedUserAuthorizedUser(handler))
+						if (!_userService.IsUserAuthorized(handler) || !_helperService.IsRequestedUserAuthorizedUser(handler))
 						{
 							handler.Reply(401);
 							break;
@@ -203,7 +215,7 @@ public class Router
 				{
 					case "/users/userinfo":
 						_logger.Debug("Routing DELETE /users/userinfo");
-						if (!Helper.IsUserAuthorized(handler))
+						if (!_userService.IsUserAuthorized(handler))
 						{
 							handler.Reply(401);
 							break;

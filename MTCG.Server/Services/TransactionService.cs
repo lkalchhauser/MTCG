@@ -1,6 +1,7 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
@@ -8,13 +9,20 @@ namespace MTCG.Server.Services;
 public class TransactionService
 {
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private PackageRepository _packageRepository = new PackageRepository();
-	private CardRepository _cardRep = new CardRepository();
-	private UserRepository _userRepository = new UserRepository();
-	private CardService _cardService = new CardService();
+	private IPackageRepository _packageRepository;
+	private ICardRepository _cardRep;
+	private IUserRepository _userRepository;
+	private CardService _cardService;
 
+	public TransactionService(IPackageRepository packageRepository, ICardRepository cardRep, IUserRepository userRepository, CardService cardService)
+	{
+		_packageRepository = packageRepository;
+		_cardRep = cardRep;
+		_userRepository = userRepository;
+		_cardService = cardService;
+	}
 
-	public Result GetRandomPackageForUser(Handler handler)
+	public Result GetRandomPackageForUser(IHandler handler)
 	{
 		var pckgId = _packageRepository.GetRandomPackageId();
 		if (pckgId == 0)

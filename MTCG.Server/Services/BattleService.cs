@@ -3,6 +3,8 @@ using System.Text.Json;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
+using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.BattleRules;
 using MTCG.Server.Util.Enums;
@@ -14,14 +16,22 @@ namespace MTCG.Server.Services;
 public class BattleService
 {
 	// TODO: give this from Router instead of new one
-	private DeckService _deckService = new DeckService();
-	private CardService _cardService = new CardService();
-	private UserService _userService = new UserService();
-	private DeckRepository _deckRepository = new DeckRepository();
-	private readonly ConcurrentQueue<(Handler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
+	private readonly DeckService _deckService;
+	private readonly CardService _cardService;
+	private readonly IUserService _userService;
+	private readonly IDeckRepository _deckRepository;
+	private readonly ConcurrentQueue<(IHandler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
+
+	public BattleService(IDeckRepository deckRepository, DeckService deckService, CardService cardService, IUserService userService)
+	{
+		_deckRepository = deckRepository;
+		_deckService = deckService;
+		_cardService = cardService;
+		_userService = userService;
+	}
 
 
-	public async Task<Result> WaitForBattleAsync(Handler handler, TimeSpan timeout, DeckService deckService, CardService cardService)
+	public async Task<Result> WaitForBattleAsync(IHandler handler, TimeSpan timeout, DeckService deckService, CardService cardService)
 	{
 		var currentUserDeckResult = deckService.GetDeckForCurrentUser(handler, true);
 		var deserializedDeck = new Deck()
@@ -31,7 +41,7 @@ public class BattleService
 
 		if (deserializedDeck.Cards != null && deserializedDeck.Cards.Count != 4)
 		{
-			return new Result(false, "Deck must contain exactly 4 cards!", Helper.TEXT_PLAIN);
+			return new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN);
 		}
 
 		var tcs = new TaskCompletionSource<Result>();
@@ -59,16 +69,16 @@ public class BattleService
 			// Timeout occurred, clean up the queue
 			if (_waitingPlayers.TryDequeue(out var remainingPlayer) && remainingPlayer == (handler, tcs))
 			{
-				var timeoutResult = new Result(false, "Timeout: No opponent found.", Helper.TEXT_PLAIN);
+				var timeoutResult = new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN);
 				tcs.SetResult(timeoutResult);
 			}
 
-			return new Result(false, "Timeout: No opponent found.", Helper.TEXT_PLAIN);
+			return new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN);
 		}
 	}
 
 	// TODO: when setting the deck after win/lose, add the new cards to user stack and not deck
-	private void DoBattle((Handler, TaskCompletionSource<Result>) player1, (Handler, TaskCompletionSource<Result>) player2, DeckService deckService)
+	private void DoBattle((IHandler, TaskCompletionSource<Result>) player1, (IHandler, TaskCompletionSource<Result>) player2, DeckService deckService)
 	{
 		// TODO: maybe lock decks so it cannot be edited?
 		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1, true).Message);
@@ -81,8 +91,8 @@ public class BattleService
 
 		if (player1DeckCards is not { Count: 4 } || player2DeckCards is not { Count: 4 })
 		{
-			player1.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", Helper.TEXT_PLAIN));
-			player2.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", Helper.TEXT_PLAIN));
+			player1.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN));
+			player2.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN));
 			return;
 		}
 
@@ -166,7 +176,7 @@ public class BattleService
 		}
 	}
 
-	private UserStats GetUpdatedUserStatsObject(Handler handler, int eloChange = 0, int winsChange = 0, int lossChange = 0, int drawsChange = 0)
+	private UserStats GetUpdatedUserStatsObject(IHandler handler, int eloChange = 0, int winsChange = 0, int lossChange = 0, int drawsChange = 0)
 	{
 		var userStats = JsonSerializer.Deserialize<UserStats>(_userService.GetUserStats(handler).Message);
 		userStats.Elo += eloChange;
@@ -176,9 +186,9 @@ public class BattleService
 		return userStats;
 	}
 
-	private Result GetResult(Handler handler, BattleResult result)
+	private Result GetResult(IHandler handler, BattleResult result)
 	{
-		if (!handler.HasPlainFormat()) return new Result(true, JsonSerializer.Serialize(result), Helper.APPL_JSON);
+		if (!handler.HasPlainFormat()) return new Result(true, JsonSerializer.Serialize(result), HelperService.APPL_JSON);
 
 		var logTable = result.GenerateBattleLogTable();
 
@@ -191,7 +201,7 @@ public class BattleService
 			logTable += $"\nYou {result.Result}!";
 		}
 				
-		return new Result(true, logTable, Helper.TEXT_PLAIN);
+		return new Result(true, logTable, HelperService.TEXT_PLAIN);
 	}
 
 	private static Card DrawRandomCardFromDeck(List<Card> deck)
