@@ -4,28 +4,32 @@ entity "user" as users {
   id: number <<generated>>
   --
   username: varchar !null
-  password varchar !null
-  token varchar
-}
-
-entity "cards" as cards {
-  id: varchar !null
-  --
-  name: varchar !null
-  description: varchar !null
-  damage: varchar !null
-  type: varchar !null
-  element: varchar
+  password: varchar !null
+  token: varchar
+  coins: number
 }
 
 entity "stats" as stats {
-    id: number <<generated>>
-    --
     user_id: number !null
     wins: number
     losses: number
     draws: number
     elo: number
 }
+
+entity "cards" as cards {
+  id: number <<generated>>
+  --
+  uuid: varchar !null
+  name: varchar !null
+  description: varchar !null
+  damage: number !null
+  element: varchar
+  type: varchar !null
+  rarity: varchar !null
+  race: varchar !null
+}
+
+
 
 user ||-|| stats

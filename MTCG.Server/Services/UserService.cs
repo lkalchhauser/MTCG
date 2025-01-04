@@ -203,4 +203,22 @@ public class UserService
 
 		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), Helper.APPL_JSON);
 	}
+
+	public Result UpdatePassword(Handler handler)
+	{
+		_logger.Debug($"Updating password for user {handler.AuthorizedUser.Username}");
+		if (handler.GetContentType() != "application/json" || handler.Payload == null)
+		{
+			_logger.Debug("Register User - No valid payload data found");
+			return new Result(false, "Badly formatted data sent!");
+		}
+
+		// TODO: what if its not valid? -> catch exception?
+		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
+		var getUserFromDb = _userRepository.GetUserById(handler.AuthorizedUser.Id);
+		getUserFromDb.Password = Helper.HashPassword(credentials.Password);
+		getUserFromDb.Token = "";
+		_userRepository.UpdateUser(getUserFromDb);
+		return new Result(true, "Password successfully updated");
+	}
 }
