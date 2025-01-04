@@ -11,5 +11,9 @@ public enum Race
     ORK,
     KNIGHT,
     KRAKEN,
-    FIRE_ELVES
+    FIRE_ELVES,
+	 SLIME,
+	 DEMON,
+	 ONI,
+	 HUMAN
 }

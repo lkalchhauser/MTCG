@@ -1,0 +1,265 @@
+[
+	{
+		"UUID": "ef758257-0f02-4161-8526-2a4ad99feb63",
+		"Name": "Rimuru Tempest (Normal)",
+		"Damage": 20.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "SLIME",
+		"Description": "A slime",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "ad3082c4-508d-4593-9efe-a82ab0effdf4",
+		"Name": "Rimuru Tempest (True Demon Lord)",
+		"Damage": 60.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "SLIME",
+		"Description": "A powerful demon lord with the ability to absorb and mimic skills.",
+		"Rarity": "MYTHIC"
+	},
+	{
+		"UUID": "3ac77774-6cba-4d22-9c24-4e221528fca4",
+		"Name": "Diablo",
+		"Damage": 40.0,
+		"Type": "MONSTER",
+		"Element": "FIRE",
+		"Race": "DEMON",
+		"Description": "One of the Primordial Seven, summoned by Rimuru. He is also known as \"Noir\".",
+		"Rarity": "LEGENDARY"
+	},
+	{
+		"UUID": "889a8a37-1f36-4f5e-a994-6be0b84fdbf9",
+		"Name": "Veldora Tempest",
+		"Damage": 50.0,
+		"Type": "MONSTER",
+		"Element": "FIRE",
+		"Race": "DRAGON",
+		"Description": "One of the five Dragons, the legendary Storm Dragon Veldora!",
+		"Rarity": "MYTHIC"
+	},
+	{
+		"UUID": "9926598e-6ccf-4d7b-aab7-3ef90f5d1fc2",
+		"Name": "Gobta",
+		"Damage": 25.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "GOBLIN",
+		"Description": "Member of the Big Four and Captain of the Goblin Riders",
+		"Rarity": "EPIC"
+	},
+	{
+		"UUID": "511bc0b3-1dfe-4323-b538-eef206a7c56f",
+		"Name": "Fuze",
+		"Damage": 10.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "HUMAN",
+		"Description": "The Guildmaster of the Free Guilds Blumund branch.",
+		"Rarity": "NORMAL"
+	},
+	{
+		"UUID": "f55edab8-6830-4415-b3d6-7cf0e61f75de",
+		"Name": "Elyun Grimwald",
+		"Damage": 15.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "FIRE_ELVES",
+		"Description": "A member of Kavals Party and part of the Sorcerous Dynasty of Sarion.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "265b5c29-c035-40ba-8974-b5fcb249d04c",
+		"Name": "Geld Junior",
+		"Damage": 18.0,
+		"Type": "MONSTER",
+		"Element": "EARTH",
+		"Race": "ORK",
+		"Description": "Right hand man of the deceased Orc Lord, he now serves Rimuru Tempest.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "128c69db-5ed5-46f9-b8f1-fccf4bdf1934",
+		"Name": "Souei",
+		"Damage": 29.0,
+		"Type": "MONSTER",
+		"Element": "AIR",
+		"Race": "ONI",
+		"Description": "Rimurus faithful shadow and the Minister of Intelligence in Tempest.",
+		"Rarity": "EPIC"
+	},
+	{
+		"UUID": "2d2b8db3-2e66-4515-925c-2b83cf9c931f",
+		"Name": "Sauzer Coleus",
+		"Damage": 13.0,
+		"Type": "MONSTER",
+		"Element": "WATER",
+		"Race": "HUMAN",
+		"Description": "The King of Coleus.",
+		"Rarity": "NORMAL"
+	},
+	{
+		"UUID": "bfe38c61-6058-44a0-9e6e-56befce0f4a1",
+		"Name": "M",
+		"Damage": 21.0,
+		"Type": "MONSTER",
+		"Element": "WATER",
+		"Race": "KRAKEN",
+		"Description": "A monste producing sarasa sand in a lake.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "36deddfc-8524-4b1c-9eb4-c48b5902e7ed",
+		"Name": "Razen",
+		"Damage": 19.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "WIZARD",
+		"Description": "Chief Sorcerer of the Kingdom of Falmuth",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "e76913d1-8951-485c-ba3d-e6d2eb83759b",
+		"Name": "Hinata Sakaguchi",
+		"Damage": 38.0,
+		"Type": "MONSTER",
+		"Element": "NORMAL",
+		"Race": "HUMAN",
+		"Description": "Leader of the Western Holy Churchs Temple Saints.",
+		"Rarity": "LEGENDARY"
+	},
+	{
+		"UUID": "a8274fe7-3d6e-423f-8edc-c9baf55f37e6",
+		"Name": "Bacchus",
+		"Damage": 22.0,
+		"Type": "MONSTER",
+		"Element": "EARTH",
+		"Race": "KNIGHT",
+		"Description": "One of the Captain of the Crusaders and a member of the Ten Great Saints.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "bbc9cda9-8b43-4681-b453-053aa4964561",
+		"Name": "Water Blade",
+		"Damage": 15.0,
+		"Type": "SPELL",
+		"Element": "WATER",
+		"Description": "Shoots out a thin water blade with termendous cutting power.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "2b1bf470-ddea-4c49-ae22-9e0addcb3f7a",
+		"Name": "Inferno Flame",
+		"Damage": 20.0,
+		"Type": "SPELL",
+		"Element": "FIRE",
+		"Description": "Calls upon the power of an elemental lord of flame to unleash powerful flames.",
+		"Rarity": "EPIC"
+	},
+	{
+		"UUID": "59a17ffb-ef67-4dd7-95f6-c72a036024d8",
+		"Name": "Aerial Blade",
+		"Damage": 12.0,
+		"Type": "SPELL",
+		"Element": "AIR",
+		"Description": "Shoots multiple blades made of compresed air.",
+		"Rarity": "Normal"
+	},
+	{
+		"UUID": "6648f6ff-8cc7-41ae-82e3-b90b3c1052bd",
+		"Name": "Earth Manipulation",
+		"Damage": 18.0,
+		"Type": "SPELL",
+		"Element": "EARTH",
+		"Description": "Allows the user to manipulate and ultilize the element of earth.",
+		"Rarity": "RARE"
+	},
+	{
+		"UUID": "d5242789-3817-467d-9592-da5fba091b0f",
+		"Name": "Mana Bullet",
+		"Damage": 10.0,
+		"Type": "SPELL",
+		"Element": "NORMAL",
+		"Description": "Materializes the users fighting spirit into a physical form and molds it into a spherical projectile.",
+		"Rarity": "NORMAL"
+	},
+	{
+		"UUID": "81a91c78-0250-4410-ad5a-d047a41fd382",
+		"Name": "Beelzebub",
+		"Damage": 47.0,
+		"Type": "SPELL",
+		"Element": "NORMAL",
+		"Description": "Absorbs almost any target (be it attacks or living beings), similar to a black hole.",
+		"Rarity": "MYTHIC"
+	},
+	{
+		"UUID": "97660971-7492-4826-9d0d-6a73dd963663",
+		"Name": "Infinity Prison",
+		"Damage": 38.0,
+		"Type": "SPELL",
+		"Element": "NORMAL",
+		"Description": "Entombs the target inside of an infinitely vast imaginary space for eternity.",
+		"Rarity": "LEGENDARY"
+	},
+	{
+		"UUID": "dc595a9c-29ee-4284-ba5d-7a44a187d76e",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	},
+	{
+		"UUID": "3d4e768f-e2bf-4022-874e-059b0c3eb1c3",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	},
+	{
+		"UUID": "2a0b5c62-e0bf-46d8-93b7-a2608b4e3722",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	},
+	{
+		"UUID": "2c95c72b-e0e8-441b-b215-7cf9dd73586e",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	},
+	{
+		"UUID": "435ff775-3a2b-440a-b9ca-81677e2c55b5",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	},
+	{
+		"UUID": "e0d18958-5042-4db5-9421-35cce51d9430",
+		"Name": "",
+		"Damage": 0,
+		"Type": "",
+		"Element": "",
+		"Race": "",
+		"Description": "",
+		"Rarity": ""
+	}
+]

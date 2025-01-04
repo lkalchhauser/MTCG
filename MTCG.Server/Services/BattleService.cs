@@ -2,6 +2,7 @@
 using System.Text.Json;
 using MTCG.Server.HTTP;
 using MTCG.Server.Models;
+using MTCG.Server.Repositories;
 using MTCG.Server.Util;
 using MTCG.Server.Util.BattleRules;
 using MTCG.Server.Util.Enums;
@@ -12,6 +13,11 @@ namespace MTCG.Server.Services;
 
 public class BattleService
 {
+	// TODO: give this from Router instead of new one
+	private DeckService _deckService = new DeckService();
+	private CardService _cardService = new CardService();
+	private UserService _userService = new UserService();
+	private DeckRepository _deckRepository = new DeckRepository();
 	private readonly ConcurrentQueue<(Handler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
 
 
@@ -66,8 +72,10 @@ public class BattleService
 	{
 		// TODO: maybe lock decks so it cannot be edited?
 		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1, true).Message);
+		var player1DeckId = _deckRepository.GetDeckIdFromUserId(player1.Item1.AuthorizedUser.Id);
 		var player1DeckBackupCopy = new List<Card>(player1DeckCards);
 		var player2DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player2.Item1, true).Message);
+		var player2DeckId = _deckRepository.GetDeckIdFromUserId(player2.Item1.AuthorizedUser.Id);
 		var player2DeckBackupCopy = new List<Card>(player2DeckCards);
 		var battleLog = new List<BattleLogEntry>();
 
@@ -119,6 +127,13 @@ public class BattleService
 
 		if (player1DeckCards.Any() && !player2DeckCards.Any())
 		{
+			_deckService.RemoveAndUnlockDeck(player2DeckId, player2.Item1.AuthorizedUser, player2DeckBackupCopy);
+			_cardService.RemoveCardsFromUserStack(player2.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
+			_cardService.AddCardsToUserStack(player1.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
+
+			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: 3, winsChange: 1));
+			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: -5, lossChange: 1));
+
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.WIN, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
 			var player2BattleResult = new BattleResult(Util.Enums.BattleResult.LOSE, battleLog);
@@ -127,17 +142,38 @@ public class BattleService
 		}
 		else if (player2DeckCards.Any() && !player1DeckCards.Any())
 		{
+			_deckService.RemoveAndUnlockDeck(player1DeckId, player1.Item1.AuthorizedUser, player1DeckBackupCopy);
+			_cardService.RemoveCardsFromUserStack(player1.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
+			_cardService.AddCardsToUserStack(player2.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
+
+			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: -5, lossChange: 1));
+			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: 3, winsChange: 1));
+
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.LOSE, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
+
 			var player2BattleResult = new BattleResult(Util.Enums.BattleResult.WIN, battleLog);
 			player2.Item2.SetResult(GetResult(player2.Item1, player2BattleResult));
 		}
 		else
 		{
+			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, drawsChange: 1));
+			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, drawsChange: 1));
+
 			var gameBattleResult = new BattleResult(Util.Enums.BattleResult.DRAW, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, gameBattleResult));
 			player2.Item2.SetResult(GetResult(player2.Item1, gameBattleResult));
 		}
+	}
+
+	private UserStats GetUpdatedUserStatsObject(Handler handler, int eloChange = 0, int winsChange = 0, int lossChange = 0, int drawsChange = 0)
+	{
+		var userStats = JsonSerializer.Deserialize<UserStats>(_userService.GetUserStats(handler).Message);
+		userStats.Elo += eloChange;
+		userStats.Wins += winsChange;
+		userStats.Losses += lossChange;
+		userStats.Draws += drawsChange;
+		return userStats;
 	}
 
 	private Result GetResult(Handler handler, BattleResult result)

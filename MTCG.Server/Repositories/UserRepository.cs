@@ -231,6 +231,23 @@ public class UserRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
+	public bool UpdateUserStats(UserStats userStats)
+	{
+		_logger.Debug($"Updating userstats \"{JsonSerializer.Serialize(userStats)}\" in db");
+		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+			UPDATE stats
+			SET elo = @elo, wins = @wins, losses = @losses, draws = @draws
+			WHERE user_id = @user_id
+			""");
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@elo", DbType.Int32, userStats.Elo);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@wins", DbType.Int32, userStats.Wins);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@losses", DbType.Int32, userStats.Losses);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@draws", DbType.Int32, userStats.Draws);
+		DatabaseConnection.AddParameterWithValue(dbCommand, "@user_id", DbType.Int32, userStats.Id);
+
+		return dbCommand.ExecuteNonQuery() == 1;
+	}
+
 	public List<UserStats> GetAllStats()
 	{
 		_logger.Debug($"Trying to get all stats from db");

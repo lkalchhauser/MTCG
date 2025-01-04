@@ -11,7 +11,7 @@ public class CardRepository
 	private readonly DatabaseConnection _dbConn = DatabaseConnection.Instance;
 	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public bool AddCard(Card card)
+	public int AddCard(Card card)
 	{
 		_logger.Debug($"Adding card \"{card.Name}\" to the DB");
 		using IDbCommand dbCommand = _dbConn.CreateCommand("""
@@ -28,7 +28,7 @@ public class CardRepository
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@rarity", DbType.String, card.Rarity.ToString());
 		DatabaseConnection.AddParameterWithValue(dbCommand, "@race", DbType.String, card.Race.ToString());
 		card.Id = (int)(dbCommand.ExecuteScalar() ?? 0);
-		return card.Id != 0;
+		return card.Id;
 	}
 
 	public Card? GetCardById(int id)

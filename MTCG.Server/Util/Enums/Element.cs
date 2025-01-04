@@ -7,5 +7,7 @@ public enum Element
 {
     NORMAL,
     FIRE,
-    WATER
+    WATER,
+	 EARTH,
+	 AIR
 }

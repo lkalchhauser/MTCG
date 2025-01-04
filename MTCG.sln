@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTCG.Server", "MTCG.Server\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{841687CA-267B-479B-816E-E43F213F5FE8}"
 	ProjectSection(SolutionItems) = preProject
+		AllCards.json = AllCards.json
 		Info.txt = Info.txt
 		README.md = README.md
 	EndProjectSection

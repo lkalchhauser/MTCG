@@ -23,28 +23,33 @@ public class CardService
 			return new Result(false, "Badly formatted data sent!");
 		}
 
+
+
 		var package = JsonSerializer.Deserialize<Package>(handler.Payload);
-		List<int> cardIds = []; // should always be 5 long
-		foreach (var packageCard in package.Cards)
-		{
-			if (_cardRepository.AddCard(packageCard))
-			{
-				cardIds.Add(packageCard.Id);
-				continue;
-			}
 
-			_logger.Debug($"Failed to add card \"{packageCard.Name}\" to database");
-			return new Result(false, "Failed to add card to database!");
-		}
-
-		// check if a package with the same name already exists
+		// check if a package with the same name already exists - currently package names have to be unique
 		var packageByName = _packageRepository.GetPackageIdByName(package.Name);
 
 		if (packageByName != null)
 		{
 			packageByName.AvailableAmount++;
 			_packageRepository.UpdatePackage(packageByName);
-			return new Result(true, "Package already exists, increased available amount!");
+			return new Result(true, "Package with this name already exists, increased available amount!");
+		}
+
+		List<int> cardIds = []; // should always be 5 long
+		foreach (var packageCard in package.Cards)
+		{
+			// if the card with this uuid already exists, we don't add a new one and return that one (cards can be in multiple packages)
+			var addCard = AddCardIfNotExists(packageCard);
+			if (addCard != 0)
+			{
+				cardIds.Add(addCard);
+				continue;
+			}
+
+			_logger.Debug($"Failed to add card \"{packageCard.Name}\" to database");
+			return new Result(false, "Failed to add card to database!");
 		}
 
 		_packageRepository.AddPackage(package);
@@ -58,6 +63,12 @@ public class CardService
 		}
 
 		return new Result(true, "Package successfully added!");
+	}
+
+	public int AddCardIfNotExists(Card card)
+	{
+		var cardFromDb = _cardRepository.GetCardByUuid(card.UUID);
+		return cardFromDb?.Id ?? _cardRepository.AddCard(card);
 	}
 
 	public bool AddCardsToUserStack(int userId, List<Card> cards)
@@ -80,6 +91,16 @@ public class CardService
 
 		relation.Quantity++;
 		return _cardRepository.UpdateUserStack(relation);
+	}
+
+	public bool RemoveCardsFromUserStack(int userId, List<Card> cards)
+	{
+		foreach (var card in cards)
+		{
+			RemoveCardFromUserStack(userId, card.Id);
+		}
+		// TODO: not best return value
+		return true;
 	}
 
 	public bool RemoveCardFromUserStack(int userId, int cardId)

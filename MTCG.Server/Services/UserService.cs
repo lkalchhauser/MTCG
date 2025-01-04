@@ -158,6 +158,12 @@ public class UserService
 		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), Helper.APPL_JSON);
 	}
 
+	public Result UpdateUserStats(Handler handler, UserStats userStats)
+	{
+		var updateSuccessful = _userRepository.UpdateUserStats(userStats);
+		return updateSuccessful ? new Result(true, "User stats successfully updated") : new Result(false, "Error while updating user stats");
+	}
+
 	public Result GetScoreboard(Handler handler)
 	{
 		var allStats = _userRepository.GetAllStats();
