@@ -13,22 +13,16 @@ using BattleResult = MTCG.Server.Models.BattleResult;
 
 namespace MTCG.Server.Services;
 
-public class BattleService
+public class BattleService(
+	IDeckRepository deckRepository,
+	IDeckService service,
+	ICardService cardService,
+	IUserService userService)
+	: IBattleService
 {
-	// TODO: give this from Router instead of new one
-	private readonly DeckService _deckService;
-	private readonly CardService _cardService;
-	private readonly IUserService _userService;
-	private readonly IDeckRepository _deckRepository;
-	private readonly ConcurrentQueue<(IHandler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
 
-	public BattleService(IDeckRepository deckRepository, DeckService deckService, CardService cardService, IUserService userService)
-	{
-		_deckRepository = deckRepository;
-		_deckService = deckService;
-		_cardService = cardService;
-		_userService = userService;
-	}
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private readonly ConcurrentQueue<(IHandler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers = new();
 
 
 	public async Task<Result> WaitForBattleAsync(IHandler handler, TimeSpan timeout, DeckService deckService, CardService cardService)
@@ -82,10 +76,10 @@ public class BattleService
 	{
 		// TODO: maybe lock decks so it cannot be edited?
 		var player1DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player1.Item1, true).Message);
-		var player1DeckId = _deckRepository.GetDeckIdFromUserId(player1.Item1.AuthorizedUser.Id);
+		var player1DeckId = deckRepository.GetDeckIdFromUserId(player1.Item1.AuthorizedUser.Id);
 		var player1DeckBackupCopy = new List<Card>(player1DeckCards);
 		var player2DeckCards = JsonSerializer.Deserialize<List<Card>>(deckService.GetDeckForCurrentUser(player2.Item1, true).Message);
-		var player2DeckId = _deckRepository.GetDeckIdFromUserId(player2.Item1.AuthorizedUser.Id);
+		var player2DeckId = deckRepository.GetDeckIdFromUserId(player2.Item1.AuthorizedUser.Id);
 		var player2DeckBackupCopy = new List<Card>(player2DeckCards);
 		var battleLog = new List<BattleLogEntry>();
 
@@ -137,12 +131,12 @@ public class BattleService
 
 		if (player1DeckCards.Any() && !player2DeckCards.Any())
 		{
-			_deckService.RemoveAndUnlockDeck(player2DeckId, player2.Item1.AuthorizedUser, player2DeckBackupCopy);
-			_cardService.RemoveCardsFromUserStack(player2.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
-			_cardService.AddCardsToUserStack(player1.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
+			service.RemoveAndUnlockDeck(player2DeckId, player2.Item1.AuthorizedUser, player2DeckBackupCopy);
+			cardService.RemoveCardsFromUserStack(player2.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
+			cardService.AddCardsToUserStack(player1.Item1.AuthorizedUser.Id, player2DeckBackupCopy);
 
-			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: 3, winsChange: 1));
-			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: -5, lossChange: 1));
+			userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: 3, winsChange: 1));
+			userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: -5, lossChange: 1));
 
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.WIN, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
@@ -152,12 +146,12 @@ public class BattleService
 		}
 		else if (player2DeckCards.Any() && !player1DeckCards.Any())
 		{
-			_deckService.RemoveAndUnlockDeck(player1DeckId, player1.Item1.AuthorizedUser, player1DeckBackupCopy);
-			_cardService.RemoveCardsFromUserStack(player1.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
-			_cardService.AddCardsToUserStack(player2.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
+			service.RemoveAndUnlockDeck(player1DeckId, player1.Item1.AuthorizedUser, player1DeckBackupCopy);
+			cardService.RemoveCardsFromUserStack(player1.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
+			cardService.AddCardsToUserStack(player2.Item1.AuthorizedUser.Id, player1DeckBackupCopy);
 
-			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: -5, lossChange: 1));
-			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: 3, winsChange: 1));
+			userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, eloChange: -5, lossChange: 1));
+			userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, eloChange: 3, winsChange: 1));
 
 			var player1BattleResult = new BattleResult(Util.Enums.BattleResult.LOSE, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, player1BattleResult));
@@ -167,8 +161,8 @@ public class BattleService
 		}
 		else
 		{
-			_userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, drawsChange: 1));
-			_userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, drawsChange: 1));
+			userService.UpdateUserStats(player1.Item1, GetUpdatedUserStatsObject(player1.Item1, drawsChange: 1));
+			userService.UpdateUserStats(player2.Item1, GetUpdatedUserStatsObject(player2.Item1, drawsChange: 1));
 
 			var gameBattleResult = new BattleResult(Util.Enums.BattleResult.DRAW, battleLog);
 			player1.Item2.SetResult(GetResult(player1.Item1, gameBattleResult));
@@ -178,7 +172,7 @@ public class BattleService
 
 	private UserStats GetUpdatedUserStatsObject(IHandler handler, int eloChange = 0, int winsChange = 0, int lossChange = 0, int drawsChange = 0)
 	{
-		var userStats = JsonSerializer.Deserialize<UserStats>(_userService.GetUserStats(handler).Message);
+		var userStats = JsonSerializer.Deserialize<UserStats>(userService.GetUserStats(handler).Message);
 		userStats.Elo += eloChange;
 		userStats.Wins += winsChange;
 		userStats.Losses += lossChange;

@@ -3,36 +3,30 @@ using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class DeckService
+public class DeckService(IDeckRepository deckRepository, ICardRepository cardRepository)
+	: IDeckService
 {
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly IDeckRepository _deckRepository;
-	private readonly ICardRepository _cardRepository;
-
-	public DeckService(IDeckRepository deckRepository, ICardRepository cardRepository)
-	{
-		_deckRepository = deckRepository;
-		_cardRepository = cardRepository;
-	}
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
 	// currently we only allow one of each card per deck and one deck per user
 	public Result GetDeckForCurrentUser(IHandler handler, bool forceJsonFormat = false)
 	{
 		_logger.Debug($"Getting current deck for user {handler.AuthorizedUser.Username}");
-		var deckId = _deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
-		var cardIds = _deckRepository.GetAllCardIdsFromDeckId(deckId);
+		var deckId = deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
+		var cardIds = deckRepository.GetAllCardIdsFromDeckId(deckId);
 		var deck = new Deck()
 		{
 			Cards = []
 		};
 		foreach (var cardId in cardIds)
 		{
-			var card = _cardRepository.GetCardById(cardId);
+			var card = cardRepository.GetCardById(cardId);
 			if (card == null)
 			{
 				_logger.Debug($"No card found for card id \"{cardId}\"");
@@ -72,7 +66,7 @@ public class DeckService
 
 		foreach (var cardUuid in cardUuids)
 		{
-			var card = _cardRepository.GetCardByUuid(cardUuid);
+			var card = cardRepository.GetCardByUuid(cardUuid);
 			if (card == null)
 			{
 				_logger.Debug($"No card found for card uuid \"{cardUuid}\"");
@@ -92,20 +86,20 @@ public class DeckService
 			return new Result(false, "Badly formatted data sent!");
 		}
 
-		var deckId = _deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
+		var deckId = deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
 		if (deckId != 0)
 		{
 			RemoveAndUnlockDeck(deckId, handler.AuthorizedUser, currentDeckCards);
 		}
 
-		var createdDeckId = _deckRepository.AddNewDeckToUserId(handler.AuthorizedUser.Id);
+		var createdDeckId = deckRepository.AddNewDeckToUserId(handler.AuthorizedUser.Id);
 
 		foreach (var card in cards)
 		{
-			var userCardRelation = _cardRepository.GetUserCardRelation(handler.AuthorizedUser.Id, card.Id);
+			var userCardRelation = cardRepository.GetUserCardRelation(handler.AuthorizedUser.Id, card.Id);
 			userCardRelation.LockedAmount++;
-			_cardRepository.UpdateUserStack(userCardRelation);
-			_deckRepository.AddCardToDeck(createdDeckId, card.Id);
+			cardRepository.UpdateUserStack(userCardRelation);
+			deckRepository.AddCardToDeck(createdDeckId, card.Id);
 		}
 
 		return new Result(true, "");
@@ -115,11 +109,11 @@ public class DeckService
 	{
 		foreach (var card in currentDeck)
 		{
-			var relation = _cardRepository.GetUserCardRelation(user.Id, card.Id);
+			var relation = cardRepository.GetUserCardRelation(user.Id, card.Id);
 			relation.LockedAmount--;
-			_cardRepository.UpdateUserStack(relation);
+			cardRepository.UpdateUserStack(relation);
 		}
-		_deckRepository.DeleteDeckById(deckId);
+		deckRepository.DeleteDeckById(deckId);
 	}
 
 	public void DeleteDeckAndCardsFromUser(int deckId, UserCredentials user, List<Card> currentDeck)
@@ -134,7 +128,7 @@ public class DeckService
 		{
 			currentAmount++;
 		}
-		var userCardRelations = _cardRepository.GetAllCardRelationsForUserId(user.Id);
+		var userCardRelations = cardRepository.GetAllCardRelationsForUserId(user.Id);
 
 		// theoretically this doesn't work if we allow the same card twice in one deck
 		return userCardRelations.Where(userCardRelation => userCardRelation.CardId == card.Id).Any(userCardRelation => (userCardRelation.Quantity - userCardRelation.LockedAmount + currentAmount) > 0);

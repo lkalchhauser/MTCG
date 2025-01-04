@@ -4,22 +4,16 @@ using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class CardService
+public class CardService(ICardRepository cardRepository, IPackageRepository packageRepository)
+	: ICardService
 {
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly ICardRepository _cardRepository;
-	private readonly IPackageRepository _packageRepository;
-
-	public CardService(ICardRepository cardRepository, IPackageRepository packageRepository)
-	{
-		_cardRepository = cardRepository;
-		_packageRepository = packageRepository;
-	}
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
 	// TODO: maybe move this to packageservice since it's actually the /package path
 	public Result CreatePackageAndCards(IHandler handler)
@@ -35,12 +29,12 @@ public class CardService
 		var package = JsonSerializer.Deserialize<Package>(handler.Payload);
 
 		// check if a package with the same name already exists - currently package names have to be unique
-		var packageByName = _packageRepository.GetPackageIdByName(package.Name);
+		var packageByName = packageRepository.GetPackageIdByName(package.Name);
 
 		if (packageByName != null)
 		{
 			packageByName.AvailableAmount++;
-			_packageRepository.UpdatePackage(packageByName);
+			packageRepository.UpdatePackage(packageByName);
 			return new Result(true, "Package with this name already exists, increased available amount!");
 		}
 
@@ -59,11 +53,11 @@ public class CardService
 			return new Result(false, "Failed to add card to database!");
 		}
 
-		_packageRepository.AddPackage(package);
+		packageRepository.AddPackage(package);
 
 		foreach (var cardId in cardIds)
 		{
-			if (_packageRepository.AddPackageCardRelation(package.Id, cardId)) continue;
+			if (packageRepository.AddPackageCardRelation(package.Id, cardId)) continue;
 
 			_logger.Debug($"Failed to add card \"{cardId}\" to package \"{package.Id}\"");
 			return new Result(false, "Failed to add card to package");
@@ -74,8 +68,8 @@ public class CardService
 
 	public int AddCardIfNotExists(Card card)
 	{
-		var cardFromDb = _cardRepository.GetCardByUuid(card.UUID);
-		return cardFromDb?.Id ?? _cardRepository.AddCard(card);
+		var cardFromDb = cardRepository.GetCardByUuid(card.UUID);
+		return cardFromDb?.Id ?? cardRepository.AddCard(card);
 	}
 
 	public bool AddCardsToUserStack(int userId, List<Card> cards)
@@ -90,14 +84,14 @@ public class CardService
 
 	public bool AddCardToUserStack(int userId, int cardId)
 	{
-		var relation = _cardRepository.GetUserCardRelation(userId, cardId);
+		var relation = cardRepository.GetUserCardRelation(userId, cardId);
 		if (relation == null)
 		{
-			return _cardRepository.AddNewCardToUserStack(userId, cardId);
+			return cardRepository.AddNewCardToUserStack(userId, cardId);
 		}
 
 		relation.Quantity++;
-		return _cardRepository.UpdateUserStack(relation);
+		return cardRepository.UpdateUserStack(relation);
 	}
 
 	public bool RemoveCardsFromUserStack(int userId, List<Card> cards)
@@ -112,7 +106,7 @@ public class CardService
 
 	public bool RemoveCardFromUserStack(int userId, int cardId)
 	{
-		var relation = _cardRepository.GetUserCardRelation(userId, cardId);
+		var relation = cardRepository.GetUserCardRelation(userId, cardId);
 		if (relation == null)
 		{
 			return false;
@@ -122,18 +116,18 @@ public class CardService
 
 		if (relation.Quantity == 1)
 		{
-			_cardRepository.RemoveCardUserStack(relation);
+			cardRepository.RemoveCardUserStack(relation);
 			return true;
 		}
 
 		relation.Quantity--;
-		_cardRepository.UpdateUserStack(relation);
+		cardRepository.UpdateUserStack(relation);
 		return true;
 	}
 
 	public bool LockCardInUserStack(int userId, int cardId)
 	{
-		var relation = _cardRepository.GetUserCardRelation(userId, cardId);
+		var relation = cardRepository.GetUserCardRelation(userId, cardId);
 		if (relation == null)
 		{
 			return false;
@@ -142,13 +136,13 @@ public class CardService
 		if (relation.Quantity <= relation.LockedAmount) return false;
 
 		relation.LockedAmount++;
-		_cardRepository.UpdateUserStack(relation);
+		cardRepository.UpdateUserStack(relation);
 		return true;
 	}
 
 	public bool UnlockCardInUserStack(int userId, int cardId)
 	{
-		var relation = _cardRepository.GetUserCardRelation(userId, cardId);
+		var relation = cardRepository.GetUserCardRelation(userId, cardId);
 		if (relation == null)
 		{
 			return false;
@@ -158,13 +152,13 @@ public class CardService
 			return false;
 
 		relation.LockedAmount--;
-		_cardRepository.UpdateUserStack(relation);
+		cardRepository.UpdateUserStack(relation);
 		return true;
 	}
 
 	public Result ShowAllCardsForUser(IHandler handler)
 	{
-		var userCardRelations = _cardRepository.GetAllCardRelationsForUserId(handler.AuthorizedUser.Id);
+		var userCardRelations = cardRepository.GetAllCardRelationsForUserId(handler.AuthorizedUser.Id);
 		if (userCardRelations.Count == 0)
 		{
 			return new Result(true, "No cards found for user!");
@@ -172,7 +166,7 @@ public class CardService
 		List<UserCards> cards = [];
 		foreach (var userCardRelation in userCardRelations)
 		{
-			var card = _cardRepository.GetCardById(userCardRelation.CardId);
+			var card = cardRepository.GetCardById(userCardRelation.CardId);
 			if (card == null)
 			{
 				return new Result(false, "Error while getting the cards");

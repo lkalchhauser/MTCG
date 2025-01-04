@@ -9,17 +9,10 @@ using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class UserService : IUserService
+public class UserService(IUserRepository userRepository, IHelperService helperService)
+	: IUserService
 {
-	private readonly IUserRepository _userRepository;
-	private readonly IHelperService _helperService;
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-
-	public UserService(IUserRepository userRepository, IHelperService helperService)
-	{
-		_userRepository = userRepository;
-		_helperService = helperService;
-	}
 
 	public Result RegisterUser(IHandler handler)
 	{
@@ -32,25 +25,25 @@ public class UserService : IUserService
 
 		// TODO: what if its not valid? -> catch exception?
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
-		var getUserFromDb = _userRepository.GetUserByUsername(credentials.Username);
+		var getUserFromDb = userRepository.GetUserByUsername(credentials.Username);
 		if (getUserFromDb != null)
 		{
 			_logger.Debug("Register User - User already exists");
 			return new Result(false, "User already exists!");
 		}
 		
-		var hashedPassword = _helperService.HashPassword(credentials.Password);
+		var hashedPassword = helperService.HashPassword(credentials.Password);
 
 		credentials.Password = hashedPassword;
 
-		var registerSuccessful = _userRepository.AddUser(credentials);
+		var registerSuccessful = userRepository.AddUser(credentials);
 
 		if (registerSuccessful != 0)
 		{
 			_logger.Debug("Register User - Successfully registered user");
 			_logger.Debug("Adding default user stats");
 			// in theory, we could just add the id since it has default values but i like doing it this way
-			var addUserStatsSuccessful = _userRepository.AddUserStats(new UserStats()
+			var addUserStatsSuccessful = userRepository.AddUserStats(new UserStats()
 			{
 				Id = registerSuccessful,
 				Elo = 100,
@@ -80,23 +73,23 @@ public class UserService : IUserService
 
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
 
-		var userFromDb = _userRepository.GetUserByUsername(credentials.Username);
+		var userFromDb = userRepository.GetUserByUsername(credentials.Username);
 		if (userFromDb == null)
 		{
 			_logger.Debug("Login User - Login failed - User does not exist");
 			return new Result(false, "Login failed - User does not exist");
 		}
 
-		if (!_helperService.VerifyPassword(credentials.Password, userFromDb.Password))
+		if (!helperService.VerifyPassword(credentials.Password, userFromDb.Password))
 		{
 			_logger.Debug("Password invalid! - Invalid Password");
 			return new Result(false, "Login failed - Login Data not correct");
 		}
 
 		_logger.Debug("Password valid! Generating token...");
-		userFromDb.Token = _helperService.GenerateToken(credentials.Username);
+		userFromDb.Token = helperService.GenerateToken(credentials.Username);
 		_logger.Debug("Saving token into DB...");
-		var userUpdateSuccessful = _userRepository.UpdateUser(userFromDb);
+		var userUpdateSuccessful = userRepository.UpdateUser(userFromDb);
 
 		if (!userUpdateSuccessful)
 		{
@@ -114,12 +107,12 @@ public class UserService : IUserService
 
 	public UserCredentials? GetAuthorizedUserWithToken(string token)
 	{
-		return _userRepository.GetUserByToken(token);
+		return userRepository.GetUserByToken(token);
 	}
 
 	public Result GetUserInformationForUser(IHandler handler)
 	{
-		var userInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+		var userInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 		if (userInfo == null)
 		{
 			_logger.Debug("Failed to get user information (null return from db)");
@@ -149,44 +142,44 @@ public class UserService : IUserService
 
 		var newUserInfo = JsonSerializer.Deserialize<UserInfo>(handler.Payload);
 		newUserInfo.Id = handler.AuthorizedUser.Id;
-		var getExistingUserInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+		var getExistingUserInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 
 		if (getExistingUserInfo == null)
 		{
-			var addUserInfoSuccessful = _userRepository.AddUserInfo(newUserInfo);
+			var addUserInfoSuccessful = userRepository.AddUserInfo(newUserInfo);
 			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
 		}
 		
-		var updateUserInfoSuccessful = _userRepository.UpdateUserInfo(newUserInfo);
+		var updateUserInfoSuccessful = userRepository.UpdateUserInfo(newUserInfo);
 		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
 	}
 
 	public Result DeleteUserInfo(IHandler handler)
 	{
-		var existingUserInfo = _userRepository.GetUserInfoByUser(handler.AuthorizedUser);
+		var existingUserInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 		if (existingUserInfo == null)
 		{
 			return new Result(false, "No user info found to delete");
 		}
-		var userInfoDeleted = _userRepository.RemoveUserInfoByUserId(handler.AuthorizedUser.Id);
+		var userInfoDeleted = userRepository.RemoveUserInfoByUserId(handler.AuthorizedUser.Id);
 		return userInfoDeleted ? new Result(true, "User info successfully deleted") : new Result(false, "Error while deleting user info");
 	}
 
 	public Result GetUserStats(IHandler handler)
 	{
-		var userStats = _userRepository.GetUserStats(handler);
+		var userStats = userRepository.GetUserStats(handler);
 		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), HelperService.APPL_JSON);
 	}
 
 	public Result UpdateUserStats(IHandler handler, UserStats userStats)
 	{
-		var updateSuccessful = _userRepository.UpdateUserStats(userStats);
+		var updateSuccessful = userRepository.UpdateUserStats(userStats);
 		return updateSuccessful ? new Result(true, "User stats successfully updated") : new Result(false, "Error while updating user stats");
 	}
 
 	public Result GetScoreboard(IHandler handler)
 	{
-		var allStats = _userRepository.GetAllStats();
+		var allStats = userRepository.GetAllStats();
 		if (allStats.Count == 0)
 		{
 			return new Result(true, "No stats found");
@@ -196,7 +189,7 @@ public class UserService : IUserService
 
 		foreach (var stat in allStats)
 		{
-			var user = _userRepository.GetUserById(stat.Id);
+			var user = userRepository.GetUserById(stat.Id);
 			if (user == null)
 			{
 				return new Result(false, "Error while getting user data");
@@ -217,7 +210,7 @@ public class UserService : IUserService
 
 		if (handler.HasPlainFormat())
 		{
-			var finalText = _helperService.GenerateScoreboardTable(sortedScoreboardUsers);
+			var finalText = helperService.GenerateScoreboardTable(sortedScoreboardUsers);
 			return new Result(true, finalText, HelperService.TEXT_PLAIN);
 		}
 
@@ -235,10 +228,10 @@ public class UserService : IUserService
 
 		// TODO: what if its not valid? -> catch exception?
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
-		var getUserFromDb = _userRepository.GetUserById(handler.AuthorizedUser.Id);
-		getUserFromDb.Password = _helperService.HashPassword(credentials.Password);
+		var getUserFromDb = userRepository.GetUserById(handler.AuthorizedUser.Id);
+		getUserFromDb.Password = helperService.HashPassword(credentials.Password);
 		getUserFromDb.Token = "";
-		_userRepository.UpdateUser(getUserFromDb);
+		userRepository.UpdateUser(getUserFromDb);
 		return new Result(true, "Password successfully updated");
 	}
 }

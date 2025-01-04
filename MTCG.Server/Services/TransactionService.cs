@@ -2,35 +2,30 @@
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class TransactionService
+public class TransactionService(
+	IPackageRepository packageRepository,
+	ICardRepository cardRep,
+	IUserRepository userRepository,
+	ICardService cardService)
+	: ITransactionService
 {
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private IPackageRepository _packageRepository;
-	private ICardRepository _cardRep;
-	private IUserRepository _userRepository;
-	private CardService _cardService;
-
-	public TransactionService(IPackageRepository packageRepository, ICardRepository cardRep, IUserRepository userRepository, CardService cardService)
-	{
-		_packageRepository = packageRepository;
-		_cardRep = cardRep;
-		_userRepository = userRepository;
-		_cardService = cardService;
-	}
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private ICardRepository _cardRep = cardRep;
 
 	public Result GetRandomPackageForUser(IHandler handler)
 	{
-		var pckgId = _packageRepository.GetRandomPackageId();
+		var pckgId = packageRepository.GetRandomPackageId();
 		if (pckgId == 0)
 		{
 			_logger.Debug("GetRandomPackageForUser - No packages found");
 			return new Result(false, "No packages found!");
 		}
-		var package = _packageRepository.GetPackageWithoutCardsById(pckgId);
+		var package = packageRepository.GetPackageWithoutCardsById(pckgId);
 
 		if (handler.AuthorizedUser.Coins < package.Cost)
 		{
@@ -38,15 +33,15 @@ public class TransactionService
 			return new Result(false, "Not enough coins!");
 		}
 
-		var packageCardIds = _packageRepository.GetPackageCardIds(pckgId);
+		var packageCardIds = packageRepository.GetPackageCardIds(pckgId);
 
 		foreach (var cardId in packageCardIds)
 		{
-			_cardService.AddCardToUserStack(handler.AuthorizedUser.Id, cardId);
+			cardService.AddCardToUserStack(handler.AuthorizedUser.Id, cardId);
 		}
 
 		handler.AuthorizedUser.Coins -= package.Cost;
-		_userRepository.UpdateUser(handler.AuthorizedUser);
+		userRepository.UpdateUser(handler.AuthorizedUser);
 		RemoveOnePackageById(package.Id);
 
 		//List<Card> cards = [];
@@ -58,13 +53,13 @@ public class TransactionService
 
 	public void RemoveOnePackageById(int packageId)
 	{
-		var package = _packageRepository.GetPackageWithoutCardsById(packageId);
+		var package = packageRepository.GetPackageWithoutCardsById(packageId);
 		if (package.AvailableAmount == 1)
 		{
-			_packageRepository.DeletePackage(package.Id);
+			packageRepository.DeletePackage(package.Id);
 			return;
 		}
 		package.AvailableAmount--;
-		_packageRepository.UpdatePackage(package);
+		packageRepository.UpdatePackage(package);
 	}
 }

@@ -3,28 +3,21 @@ using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
-public class TradeService
+public class TradeService(
+	ITradeRepository tradeRepository,
+	ICardRepository cardRepository,
+	IUserRepository userRepository,
+	ICardService cardService)
+	: ITradeService
 {
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly ITradeRepository _tradeRepository;
-	private readonly ICardRepository _cardRepository;
-	private readonly IUserRepository _userRepository;
-	// TODO: übergeben
-	private readonly CardService _cardService;
-
-	public TradeService(ITradeRepository tradeRepository, ICardRepository cardRepository, IUserRepository userRepository, CardService cardService)
-	{
-		_tradeRepository = tradeRepository;
-		_cardRepository = cardRepository;
-		_userRepository = userRepository;
-		_cardService = cardService;
-	}
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
 	public Result CreateTradeOffer(IHandler handler)
 	{
@@ -36,7 +29,7 @@ public class TradeService
 		// TODO: error handling?
 		var tradeOffer = JsonSerializer.Deserialize<TradeOffer>(handler.Payload);
 		tradeOffer.UserId = handler.AuthorizedUser.Id;
-		var card = _cardRepository.GetCardByUuid(tradeOffer.CardUUID);
+		var card = cardRepository.GetCardByUuid(tradeOffer.CardUUID);
 		if (card == null)
 		{
 			_logger.Debug("CreateTradeOffer - Card not found");
@@ -44,7 +37,7 @@ public class TradeService
 		}
 		tradeOffer.CardId = card.Id;
 
-		var cardUserRelation = _cardRepository.GetUserCardRelation(handler.AuthorizedUser.Id, card.Id);
+		var cardUserRelation = cardRepository.GetUserCardRelation(handler.AuthorizedUser.Id, card.Id);
 		if (cardUserRelation == null)
 		{
 			_logger.Debug("CreateTradeOffer - Card not owned by user");
@@ -55,21 +48,21 @@ public class TradeService
 			return new Result(false, "No card available to trade!");
 		}
 
-		var tradeOfferId = _tradeRepository.AddTradeOffer(tradeOffer);
+		var tradeOfferId = tradeRepository.AddTradeOffer(tradeOffer);
 		if (!tradeOfferId)
 		{
 			_logger.Debug("CreateTradeOffer - Failed to add trade offer");
 			return new Result(false, "Failed to add trade offer!");
 		}
 
-		_cardService.LockCardInUserStack(handler.AuthorizedUser.Id, card.Id);
+		cardService.LockCardInUserStack(handler.AuthorizedUser.Id, card.Id);
 		return new Result(true, "Trade deal successfully created!");
 	}
 
 
 	public Result GetCurrentlyActiveTrades(IHandler handler)
 	{
-		var currentTrades = _tradeRepository.GetAllTradesWithStatus(TradeStatus.ACTIVE);
+		var currentTrades = tradeRepository.GetAllTradesWithStatus(TradeStatus.ACTIVE);
 		if (currentTrades == null)
 		{
 			_logger.Debug("GetCurrentlyActiveTrades - No trades found");
@@ -110,13 +103,13 @@ public class TradeService
 
 	private string? GetCardNameFromId(int cardId)
 	{
-		var cardNameFromId = _cardRepository.GetCardById(cardId)?.Name;
+		var cardNameFromId = cardRepository.GetCardById(cardId)?.Name;
 		return cardNameFromId ?? null;
 	}
 
 	private string GetUserNameFromId(int userId)
 	{
-		var userNameFromId = _userRepository.GetUserById(userId)?.Username;
+		var userNameFromId = userRepository.GetUserById(userId)?.Username;
 		return userNameFromId ?? "Unknown";
 	}
 }
