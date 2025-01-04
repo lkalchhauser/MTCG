@@ -150,18 +150,21 @@ public class DbUtil
 		createBattleTable.ExecuteNonQuery();
 
 		// Trade table
-		var dropTradeTable = new NpgsqlCommand("DROP TABLE IF EXISTS trades CASCADE", connection);
+		var dropTradeTable = new NpgsqlCommand("DROP TABLE IF EXISTS trade_offers CASCADE", connection);
 		dropTradeTable.ExecuteNonQuery();
 		// TODO: maybe add a way to log when the trade is completed
 		var createTradeTable = new NpgsqlCommand("""
-		                                         CREATE TABLE trades(
+		                                         CREATE TABLE trade_offers(
 		                                         id SERIAL PRIMARY KEY,
-		                                         offered_by_user_id int REFERENCES users(id) ON DELETE CASCADE,
+		                                         offering_user_id int REFERENCES users(id) ON DELETE CASCADE,
 		                                         offered_card_id int NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
 		                                         desired_card_type VARCHAR,
-		                                         desired_minimum_damage int,
+		                                         desired_card_rarity VARCHAR,
+		                                         desired_card_race VARCHAR,
+		                                         desired_card_element VARCHAR,
+		                                         desired_card_minimum_damage INT,
 		                                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		                                         status VARCHAR DEFAULT 'active'
+		                                         status VARCHAR DEFAULT 'ACTIVE'
 		                                         );
 		                                         """, connection);
 		createTradeTable.ExecuteNonQuery();
@@ -171,9 +174,10 @@ public class DbUtil
 		dropTradeAcceptTable.ExecuteNonQuery();
 		var createTradeAcceptTable = new NpgsqlCommand("""
 		                                               CREATE TABLE trade_accept(
-		                                               trade_id int NOT NULL REFERENCES trades(id) ON DELETE CASCADE,
+		                                               trade_id int NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
 		                                               accepted_user_id int NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-		                                               accepted_Card_id int NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+		                                               provided_card_id int NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+		                                               timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		                                               PRIMARY KEY (trade_id, accepted_user_id)
 		                                               );
 		                                               """, connection);

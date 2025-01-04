@@ -1,5 +1,6 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
+using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Util;
 
@@ -91,5 +92,15 @@ public class Helper
 
 		var finalTable = $"{headerRow}\n{separatorRow}\n{string.Join("\n", rows)}";
 		return finalTable;
+	}
+
+	public static TEnum? ParseEnumOrNull<TEnum>(string value) where TEnum : struct, Enum
+	{
+		// Use TryParse to attempt parsing
+		if (Enum.TryParse(value, true, out TEnum result))
+		{
+			return result; // Return the parsed enum value
+		}
+		return null; // Return null if parsing fails
 	}
 }

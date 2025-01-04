@@ -19,6 +19,7 @@ public class Router
 	private TransactionService _transactionService = new TransactionService();
 	private DeckService _deckService = new DeckService();
 	private BattleService _battleService = new BattleService();
+	private TradeService _tradingService = new TradeService();
 
 	public async void HandleIncoming(Handler handler)
 	{
@@ -80,7 +81,15 @@ public class Router
 						handler.Reply(getScoreboardResult.Success ? 200 : 400, getScoreboardResult.Message, getScoreboardResult.ContentType);
 						break;
 					case "/tradings":
-						// return all tradings
+						_logger.Debug("Routing GET /tradings");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
+						var getAllTradesResult = _tradingService.GetCurrentlyActiveTrades(handler);
+						handler.Reply(getAllTradesResult.Success ? 200 : 400, getAllTradesResult.Message, getAllTradesResult.ContentType);
 						break;
 					default:
 						handler.Reply(404);
@@ -135,13 +144,19 @@ public class Router
 						handler.Reply(battleRequestResult.Success ? 200 : 408, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
 					case "/tradings":
-						// create new trading
+						_logger.Debug("Routing POST /tradings");
+						if (!Helper.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+						var createTradingOffer = _tradingService.CreateTradeOffer(handler);
+						handler.Reply(createTradingOffer.Success ? 200 : 400, createTradingOffer.Message, createTradingOffer.ContentType);
 						break;
 					default:
 						handler.Reply(404);
 						break;
 				}
-				// tradings
 				// tradings/{tradingdealid}
 				break;
 			case "PUT":
@@ -179,7 +194,6 @@ public class Router
 						var addOrUpdateUserInfoResult = _userService.AddOrUpdateUserInfo(handler);
 						handler.Reply(addOrUpdateUserInfoResult.Success ? 200 : 400, addOrUpdateUserInfoResult.Message, addOrUpdateUserInfoResult.ContentType);
 						break;
-
 				}
 				break;
 

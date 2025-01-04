@@ -8,7 +8,7 @@ public class Result
 	public string ContentType;
 
 	// TODO: Add more properties if needed - token is theoretically not needed but would be better if tokens are replied properly
-	// also maybe add a status code to the result
+	// TODO: also maybe add a status code to the result - so we can do it like said in the yaml doc
 	public Result(bool success, string message, string contentType = Helper.TEXT_PLAIN)
 	{
 		Success = success;
