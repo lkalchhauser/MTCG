@@ -130,7 +130,7 @@ public class TradeServiceTests
 		var result = _tradeService.GetCurrentlyActiveTrades(_handler);
 
 		Assert.That(result.Success, Is.True);
-		Assert.That(result.StatusCode, Is.EqualTo(200)); // OK
+		Assert.That(result.StatusCode, Is.EqualTo(200));
 		Assert.That(result.Message, Is.EqualTo(JsonSerializer.Serialize(activeTrades)));
 	}
 

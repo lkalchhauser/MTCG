@@ -30,7 +30,7 @@ public class UserServiceTests
 	public void RegisterUser_ShouldReturnErrorIfPayloadIsInvalid()
 	{
 		var handler = TestHelper.CreateMockHandler("username", 1);
-		handler.GetContentType().Returns("application/xml"); // invalid payload type
+		handler.GetContentType().Returns("application/xml");
 		handler.Payload.Returns((string)null);
 
 		var result = _userService.RegisterUser(handler);
@@ -150,10 +150,8 @@ public class UserServiceTests
 		handler.AuthorizedUser.Returns(user);
 		_userRepository.GetUserInfoByUser(user).Returns((UserInfo)null);
 
-		// Act
 		var result = _userService.GetUserInformationForUser(handler);
 
-		// Assert
 		Assert.That(result.Success, Is.False);
 		Assert.That(result.StatusCode, Is.EqualTo(404));
 		Assert.That(result.Message, Is.EqualTo("Failed to get user information - no data found"));
@@ -204,7 +202,7 @@ public class UserServiceTests
 		var result = _userService.UpdatePassword(handler);
 
 		Assert.That(result.Success, Is.True);
-		Assert.That(result.StatusCode, Is.EqualTo(200)); // OK
+		Assert.That(result.StatusCode, Is.EqualTo(200));
 		Assert.That(result.Message, Is.EqualTo("Password successfully updated"));
 	}
 
@@ -263,12 +261,12 @@ public class UserServiceTests
 		var handler = TestHelper.CreateMockHandler("User1", 1);
 		var user = TestHelper.CreateSimpleUser(1, "User1");
 		handler.GetAuthorizationToken().Returns("User1-mtcgToken");
-		_userRepository.GetUserByToken("User1-mtcgToken").Returns(user); // User found
+		_userRepository.GetUserByToken("User1-mtcgToken").Returns(user);
 
 		var result = _userService.IsUserAuthorized(handler);
 
 		Assert.That(result, Is.True);
-		Assert.That(handler.AuthorizedUser, Is.EqualTo(user)); // AuthorizedUser should be set
+		Assert.That(handler.AuthorizedUser, Is.EqualTo(user));
 	}
 
 	[Test]

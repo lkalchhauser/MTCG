@@ -141,7 +141,7 @@ public class BattleServiceTests
 	public async Task WaitForBattleAsync_InvalidDeck_ReturnsErrorResult()
 	{
 		var player1 = TestHelper.CreateMockHandler("Player1", 1);
-		var invalidDeck = CreateDeck(3); // Less than 4 cards
+		var invalidDeck = CreateDeck(3);
 
 		_deckService.GetDeckForCurrentUser(player1, true)
 			.Returns(new Result(true, JsonSerializer.Serialize(invalidDeck), "application/json"));
@@ -157,8 +157,8 @@ public class BattleServiceTests
 	{
 		var player1 = TestHelper.CreateMockHandler("Player1", 1);
 		var player2 = TestHelper.CreateMockHandler("Player2", 2);
-		var player1Deck = CreateDeck(4, 10); // same damage for all cards
-		var player2Deck = CreateDeck(4, 10); // same damage for all cards
+		var player1Deck = CreateDeck(4, 10);
+		var player2Deck = CreateDeck(4, 10);
 
 		_deckService.GetDeckForCurrentUser(player1, true)
 			.Returns(new Result(true, JsonSerializer.Serialize(player1Deck), "application/json"));
