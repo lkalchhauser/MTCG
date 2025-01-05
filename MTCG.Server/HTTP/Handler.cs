@@ -134,7 +134,6 @@ public class Handler : IHandler
 	{
 		_logger.Debug("Replying to request");
 		StatusCode = statusCode;
-
 		var response = $"HTTP/1.1 {statusCode} {_helperService.GetHttpCodes()[statusCode]}\n";
 		if (string.IsNullOrEmpty(body))
 		{

@@ -35,6 +35,13 @@ public class BattleService(
 	public async Task<Result> WaitForBattleAsync(IHandler handler, TimeSpan timeout)
 	{
 		var currentUserDeckResult = deckService.GetDeckForCurrentUser(handler, true);
+
+		if (currentUserDeckResult.Message == "")
+		{
+			_logger.Debug("Deck did not contain enough cards to be queued!");
+			return new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN, 400);
+		}
+
 		var deserializedDeck = new Deck()
 		{
 			Cards = JsonSerializer.Deserialize<List<Card>>(currentUserDeckResult.Message)

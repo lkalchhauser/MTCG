@@ -1,0 +1,1859 @@
+{
+	"info": {
+		"_postman_id": "c922e183-417d-4592-a17f-ca045f29c204",
+		"name": "MTCG",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38277026"
+	},
+	"item": [
+		{
+			"name": "RegisterUser",
+			"item": [
+				{
+					"name": "Successful",
+					"item": [
+						{
+							"name": "UserRegisterAdmin",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"admin\",\r\n    \"Password\": \"istrator\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UserRegisterAltenhof",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"altenhof\",\r\n    \"Password\": \"markus\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UserRegisterKienboec",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"kienboec\",\r\n    \"Password\": \"daniel\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fail",
+					"item": [
+						{
+							"name": "UserRegisterKienboecWrongPassword",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"kienboec\",\r\n    \"Password\": \"password\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "LoginUser",
+			"item": [
+				{
+					"name": "Successful",
+					"item": [
+						{
+							"name": "UserLoginAdmin",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"admin\",\r\n    \"Password\": \"istrator\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/sessions",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"sessions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UserLoginAltenhof",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"altenhof\",\r\n    \"Password\": \"markus\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/sessions",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"sessions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UserLoginKienboec",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"kienboec\",\r\n    \"Password\": \"daniel\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/sessions",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"sessions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fail",
+					"item": [
+						{
+							"name": "UserLoginKienboecWrongPassword",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Username\": \"kienboec\",\r\n    \"Password\": \"password\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/sessions",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"sessions"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "UpdatePasswordAltenhof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Password\": \"newpassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/users/password",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"users",
+								"password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CreatePackages",
+			"item": [
+				{
+					"name": "Successful",
+					"item": [
+						{
+							"name": "CreatePackage (Rimuru 1 - RARE)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "admin-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Rimuru 1\",\r\n    \"Cost\": 5,\r\n    \"Rarity\": \"RARE\",\r\n    \"Cards\": [\r\n        {\r\n            \"UUID\": \"ef758257-0f02-4161-8526-2a4ad99feb63\",\r\n            \"Name\": \"Rimuru Tempest (Normal)\",\r\n            \"Damage\": 20.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"SLIME\",\r\n            \"Description\": \"A slime\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"511bc0b3-1dfe-4323-b538-eef206a7c56f\",\r\n            \"Name\": \"Fuze\",\r\n            \"Damage\": 10.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"HUMAN\",\r\n            \"Description\": \"The Guildmaster of the Free Guilds Blumund branch.\",\r\n            \"Rarity\": \"NORMAL\"\r\n        },\r\n        {\r\n            \"UUID\": \"f55edab8-6830-4415-b3d6-7cf0e61f75de\",\r\n            \"Name\": \"Elyun Grimwald\",\r\n            \"Damage\": 15.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"FIRE_ELVES\",\r\n            \"Description\": \"A member of Kavals Party and part of the Sorcerous Dynasty of Sarion.\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"bfe38c61-6058-44a0-9e6e-56befce0f4a1\",\r\n            \"Name\": \"M\",\r\n            \"Damage\": 21.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"WATER\",\r\n            \"Race\": \"KRAKEN\",\r\n            \"Description\": \"A monste producing sarasa sand in a lake.\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"bbc9cda9-8b43-4681-b453-053aa4964561\",\r\n            \"Name\": \"Water Blade\",\r\n            \"Damage\": 15.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"WATER\",\r\n            \"Description\": \"Shoots out a thin water blade with termendous cutting power.\",\r\n            \"Rarity\": \"RARE\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/packages",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"packages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreatePackage (Rimuru 2 - EPIC)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "admin-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Rimuru 2\",\r\n    \"Cost\": 5,\r\n    \"Rarity\": \"EPIC\",\r\n    \"Cards\": [\r\n        {\r\n            \"UUID\": \"9926598e-6ccf-4d7b-aab7-3ef90f5d1fc2\",\r\n            \"Name\": \"Gobta\",\r\n            \"Damage\": 25.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"GOBLIN\",\r\n            \"Description\": \"Member of the Big Four and Captain of the Goblin Riders\",\r\n            \"Rarity\": \"EPIC\"\r\n        },\r\n        {\r\n            \"UUID\": \"128c69db-5ed5-46f9-b8f1-fccf4bdf1934\",\r\n            \"Name\": \"Souei\",\r\n            \"Damage\": 29.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"AIR\",\r\n            \"Race\": \"ONI\",\r\n            \"Description\": \"Rimurus faithful shadow and the Minister of Intelligence in Tempest.\",\r\n            \"Rarity\": \"EPIC\"\r\n        },\r\n        {\r\n            \"UUID\": \"a8274fe7-3d6e-423f-8edc-c9baf55f37e6\",\r\n            \"Name\": \"Bacchus\",\r\n            \"Damage\": 22.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"EARTH\",\r\n            \"Race\": \"KNIGHT\",\r\n            \"Description\": \"One of the Captain of the Crusaders and a member of the Ten Great Saints.\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"2b1bf470-ddea-4c49-ae22-9e0addcb3f7a\",\r\n            \"Name\": \"Inferno Flame\",\r\n            \"Damage\": 20.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"FIRE\",\r\n            \"Description\": \"Calls upon the power of an elemental lord of flame to unleash powerful flames.\",\r\n            \"Rarity\": \"EPIC\"\r\n        },\r\n        {\r\n            \"UUID\": \"6648f6ff-8cc7-41ae-82e3-b90b3c1052bd\",\r\n            \"Name\": \"Earth Manipulation\",\r\n            \"Damage\": 18.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"EARTH\",\r\n            \"Description\": \"Allows the user to manipulate and ultilize the element of earth.\",\r\n            \"Rarity\": \"RARE\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/packages",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"packages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreatePackage (Rimuru 3 - LEGENDARY)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "admin-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Rimuru 3\",\r\n    \"Cost\": 5,\r\n    \"Rarity\": \"LEGENDARY\",\r\n    \"Cards\": [\r\n        {\r\n            \"UUID\": \"3ac77774-6cba-4d22-9c24-4e221528fca4\",\r\n            \"Name\": \"Diablo\",\r\n            \"Damage\": 40.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"FIRE\",\r\n            \"Race\": \"DEMON\",\r\n            \"Description\": \"One of the Primordial Seven, summoned by Rimuru. He is also known as \\\"Noir\\\".\",\r\n            \"Rarity\": \"LEGENDARY\"\r\n        },\r\n        {\r\n            \"UUID\": \"36deddfc-8524-4b1c-9eb4-c48b5902e7ed\",\r\n            \"Name\": \"Razen\",\r\n            \"Damage\": 19.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"WIZARD\",\r\n            \"Description\": \"Chief Sorcerer of the Kingdom of Falmuth\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"265b5c29-c035-40ba-8974-b5fcb249d04c\",\r\n            \"Name\": \"Geld Junior\",\r\n            \"Damage\": 18.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"EARTH\",\r\n            \"Race\": \"ORK\",\r\n            \"Description\": \"Right hand man of the deceased Orc Lord, he now serves Rimuru Tempest.\",\r\n            \"Rarity\": \"RARE\"\r\n        },\r\n        {\r\n            \"UUID\": \"97660971-7492-4826-9d0d-6a73dd963663\",\r\n            \"Name\": \"Infinity Prison\",\r\n            \"Damage\": 38.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Description\": \"Entombs the target inside of an infinitely vast imaginary space for eternity.\",\r\n            \"Rarity\": \"LEGENDARY\"\r\n        },\r\n        {\r\n            \"UUID\": \"59a17ffb-ef67-4dd7-95f6-c72a036024d8\",\r\n            \"Name\": \"Aerial Blade\",\r\n            \"Damage\": 12.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"AIR\",\r\n            \"Description\": \"Shoots multiple blades made of compresed air.\",\r\n            \"Rarity\": \"Normal\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/packages",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"packages"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreatePackage (Rimuru 4 - MYTHICAL)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "admin-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Rimuru 4\",\r\n    \"Cost\": 5,\r\n    \"Rarity\": \"MYTHIC\",\r\n    \"Cards\": [\r\n        {\r\n            \"UUID\": \"ad3082c4-508d-4593-9efe-a82ab0effdf4\",\r\n            \"Name\": \"Rimuru Tempest (True Demon Lord)\",\r\n            \"Damage\": 60.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"SLIME\",\r\n            \"Description\": \"A powerful demon lord with the ability to absorb and mimic skills.\",\r\n            \"Rarity\": \"MYTHIC\"\r\n        },\r\n        {\r\n            \"UUID\": \"889a8a37-1f36-4f5e-a994-6be0b84fdbf9\",\r\n            \"Name\": \"Veldora Tempest\",\r\n            \"Damage\": 50.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"FIRE\",\r\n            \"Race\": \"DRAGON\",\r\n            \"Description\": \"One of the five Dragons, the legendary Storm Dragon Veldora!\",\r\n            \"Rarity\": \"MYTHIC\"\r\n        },\r\n        {\r\n            \"UUID\": \"e76913d1-8951-485c-ba3d-e6d2eb83759b\",\r\n            \"Name\": \"Hinata Sakaguchi\",\r\n            \"Damage\": 38.0,\r\n            \"Type\": \"MONSTER\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Race\": \"HUMAN\",\r\n            \"Description\": \"Leader of the Western Holy Churchs Temple Saints.\",\r\n            \"Rarity\": \"LEGENDARY\"\r\n        },\r\n        {\r\n            \"UUID\": \"97660971-7492-4826-9d0d-6a73dd963663\",\r\n            \"Name\": \"Infinity Prison\",\r\n            \"Damage\": 38.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Description\": \"Entombs the target inside of an infinitely vast imaginary space for eternity.\",\r\n            \"Rarity\": \"LEGENDARY\"\r\n        },\r\n        {\r\n            \"UUID\": \"81a91c78-0250-4410-ad5a-d047a41fd382\",\r\n            \"Name\": \"Beelzebub\",\r\n            \"Damage\": 47.0,\r\n            \"Type\": \"SPELL\",\r\n            \"Element\": \"NORMAL\",\r\n            \"Description\": \"Absorbs almost any target (be it attacks or living beings), similar to a black hole.\",\r\n            \"Rarity\": \"MYTHIC\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/packages",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"packages"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fail",
+					"item": []
+				}
+			]
+		},
+		{
+			"name": "BuyPackages",
+			"item": [
+				{
+					"name": "BuyRandomPackageAltenhof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/transactions/packages",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"transactions",
+								"packages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BuyRandomPackageKienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/transactions/packages",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"transactions",
+								"packages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GetUserCards",
+			"item": [
+				{
+					"name": "Successful",
+					"item": [
+						{
+							"name": "GetUserCardsKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/cards",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetUserCardsAltenhof",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/cards",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fail",
+					"item": [
+						{
+							"name": "GetUserCardsNoToken",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/cards",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "GetUserDeck",
+			"item": [
+				{
+					"name": "GetUserDeckKienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/deck",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserDeckKienboecPlain",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/deck?format=plain",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserDeckAltenhof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/deck",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserDeckAltenhofPlain",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/deck?format=plain",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ConfigureUserDeck",
+			"item": [
+				{
+					"name": "Fail",
+					"item": [
+						{
+							"name": "ConfigureUserDeckAltenhofInvalidAmount",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"889a8a37-1f36-4f5e-a994-6be0b84fdbf9\",\r\n    \"3ac77774-6cba-4d22-9c24-4e221528fca4\",\r\n    \"36deddfc-8524-4b1c-9eb4-c48b5902e7ed\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/deck",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"deck"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ConfigureUserDeckAltenhofInvalidUUID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"889a8a37-1f36-4f5e-a994-6be0b84fdbc5\",\r\n    \"3ac77774-6cba-4d22-9c24-4e221528fca4\",\r\n    \"36deddfc-8524-4b1c-9eb4-c48b5902e7ed\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/deck",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"deck"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "ConfigureUserDeck1Kienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    \"bfe38c61-6058-44a0-9e6e-56befce0f4a1\",\r\n    \"f55edab8-6830-4415-b3d6-7cf0e61f75de\",\r\n    \"511bc0b3-1dfe-4323-b538-eef206a7c56f\",\r\n    \"bbc9cda9-8b43-4681-b453-053aa4964561\"\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/deck",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ConfigureUserDeck2Kienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    \"ef758257-0f02-4161-8526-2a4ad99feb63\",\r\n    \"f55edab8-6830-4415-b3d6-7cf0e61f75de\",\r\n    \"511bc0b3-1dfe-4323-b538-eef206a7c56f\",\r\n    \"bbc9cda9-8b43-4681-b453-053aa4964561\"\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/deck",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ConfigureUserDeckAltenhof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    \"889a8a37-1f36-4f5e-a994-6be0b84fdbf9\",\r\n    \"3ac77774-6cba-4d22-9c24-4e221528fca4\",\r\n    \"36deddfc-8524-4b1c-9eb4-c48b5902e7ed\",\r\n    \"59a17ffb-ef67-4dd7-95f6-c72a036024d8\"\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{serverUrl}}/deck",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"deck"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UserData",
+			"item": [
+				{
+					"name": "GetUserData",
+					"item": [
+						{
+							"name": "Fail",
+							"item": [
+								{
+									"name": "KienboecGetUserDataAltenhof",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "kienboec-mtcgToken",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{serverUrl}}/users/altenhof",
+											"host": [
+												"{{serverUrl}}"
+											],
+											"path": [
+												"users",
+												"altenhof"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "KienboecGetRandomUserData",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "kienboec-mtcgToken",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{serverUrl}}/users/someGuy",
+											"host": [
+												"{{serverUrl}}"
+											],
+											"path": [
+												"users",
+												"someGuy"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "AltenhofGetUserDataKienboec",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "altenhof-mtcgToken",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{serverUrl}}/users/kienboec",
+											"host": [
+												"{{serverUrl}}"
+											],
+											"path": [
+												"users",
+												"kienboec"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "GetUserDataKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/users/kienboec",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"kienboec"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetUserDataAltenhof",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/users/altenhof",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"altenhof"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "EditUserData",
+					"item": [
+						{
+							"name": "Fail",
+							"item": [
+								{
+									"name": "AltenhofAddUpdateUserDataKienboec",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "altenhof-mtcgToken",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"Name\": \"Der Altenhof\",\r\n    \"Bio\": \"Die bessere Bio\",\r\n    \"Image\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{serverUrl}}/users/kienboec",
+											"host": [
+												"{{serverUrl}}"
+											],
+											"path": [
+												"users",
+												"kienboec"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "KienboecAddUpdateUserDataAltenhof",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "kienboec-mtcgToken",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"Name\": \"Der Altenhof\",\r\n    \"Bio\": \"Die bessere Bio\",\r\n    \"Image\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{serverUrl}}/users/altenhof",
+											"host": [
+												"{{serverUrl}}"
+											],
+											"path": [
+												"users",
+												"altenhof"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "AddUpdateUserDataKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Der Keinboec\",\r\n    \"Bio\": \"Hallo ich bins, deine Bio\",\r\n    \"Image\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users/kienboec",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"kienboec"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddUpdateUserDataKienboec2",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Der neue Keinboec\",\r\n    \"Bio\": \"Hallo ich bins, deine neue Bio\",\r\n    \"Image\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users/kienboec",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"kienboec"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddUpdateUserDataAltenhof",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Der Altenhof\",\r\n    \"Bio\": \"Die bessere Bio\",\r\n    \"Image\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users/altenhof",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"altenhof"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddUpdateUserDataAltenhof2",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Der neue Altenhof\",\r\n    \"Bio\": \"Die neue bessere Bio\",\r\n    \"Image\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/users/altenhof",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"users",
+										"altenhof"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "DeleteUserDataKienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/users/userinfo",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"users",
+								"userinfo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UserStats",
+			"item": [
+				{
+					"name": "GetUserStatsKienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/stats",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserStatsAltenhof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/stats",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Scoreboard",
+			"item": [
+				{
+					"name": "GetScoreboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/scoreboard",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"scoreboard"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetScoreboardPlainFormat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/scoreboard?format=plain",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"scoreboard"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Battle",
+			"item": [
+				{
+					"name": "StartBattleKienboec",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "kienboec-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/battles",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"battles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "StartBattleAltenhofFormatPlain",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "altenhof-mtcgToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{serverUrl}}/battles?format=plain",
+							"host": [
+								"{{serverUrl}}"
+							],
+							"path": [
+								"battles"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "plain"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trading",
+			"item": [
+				{
+					"name": "CreateTrade",
+					"item": [
+						{
+							"name": "CreateTradinKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"CardUUID\": \"bfe38c61-6058-44a0-9e6e-56befce0f4a1\",\r\n    \"DesiredCardMinimumDamage\": 10.0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/tradings",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CreateTradinKienboec2",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"CardUUID\": \"bfe38c61-6058-44a0-9e6e-56befce0f4a1\",\r\n    \"DesiredCardRace\": \"SLIME\",\r\n    \"DesiredCardRarity\": \"RARE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/tradings",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "DeleteTrade",
+					"item": [
+						{
+							"name": "DeleteTradeDealKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/tradings/1",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "AcceptTrade",
+					"item": [
+						{
+							"name": "AcceptTradeDeal",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"UUID\": \"ef758257-0f02-4161-8526-2a4ad99feb63\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/tradings/2",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AcceptTradeDealSelf",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"UUID\": \"511bc0b3-1dfe-4323-b538-eef206a7c56f\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{serverUrl}}/tradings/2",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GetTrade",
+					"item": [
+						{
+							"name": "GetActiveTradesKienboec",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/tradings",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "plain",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetActiveTradesAltenhof",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "altenhof-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/tradings",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "plain",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetActiveTradesFormatPlain",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "kienboec-mtcgToken",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{serverUrl}}/tradings?format=plain",
+									"host": [
+										"{{serverUrl}}"
+									],
+									"path": [
+										"tradings"
+									],
+									"query": [
+										{
+											"key": "format",
+											"value": "plain"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

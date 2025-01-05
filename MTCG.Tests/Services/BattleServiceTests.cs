@@ -102,8 +102,8 @@ public class BattleServiceTests
 		_userService.UpdateUserStats(Arg.Any<Handler>(), Arg.Any<UserStats>()).Returns(new Result(true, ""));
 
 
-		var task1 = _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(10), _deckService, _cardService);
-		var task2 = _battleService.WaitForBattleAsync(player2, TimeSpan.FromSeconds(10), _deckService, _cardService);
+		var task1 = _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(10));
+		var task2 = _battleService.WaitForBattleAsync(player2, TimeSpan.FromSeconds(10));
 		var result1 = await task1;
 		var result2 = await task2;
 
@@ -130,7 +130,7 @@ public class BattleServiceTests
 		_deckService.GetDeckForCurrentUser(player1, true)
 			.Returns(new Result(true, JsonSerializer.Serialize(player1Deck), "application/json"));
 
-		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromMilliseconds(100), _deckService, _cardService);
+		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromMilliseconds(100));
 
 		Assert.That(result.Success, Is.False);
 		Assert.That(result.Message, Does.Contain("Timeout"));
@@ -145,7 +145,7 @@ public class BattleServiceTests
 		_deckService.GetDeckForCurrentUser(player1, true)
 			.Returns(new Result(true, JsonSerializer.Serialize(invalidDeck), "application/json"));
 
-		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(5), _deckService, _cardService);
+		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(5));
 
 		Assert.That(result.Success, Is.False);
 		Assert.That(result.Message, Does.Contain("Deck must contain exactly 4 cards"));
@@ -173,8 +173,8 @@ public class BattleServiceTests
 		_userService.GetUserStats(player2).Returns(result);
 		_userService.UpdateUserStats(Arg.Any<Handler>(), Arg.Any<UserStats>()).Returns(new Result(true, ""));
 
-		var task1 = _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(5), _deckService, _cardService);
-		var task2 = _battleService.WaitForBattleAsync(player2, TimeSpan.FromSeconds(5), _deckService, _cardService);
+		var task1 = _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(5));
+		var task2 = _battleService.WaitForBattleAsync(player2, TimeSpan.FromSeconds(5));
 		var result1 = await task1;
 		var result2 = await task2;
 

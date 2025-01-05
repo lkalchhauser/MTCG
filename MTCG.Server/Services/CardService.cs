@@ -216,7 +216,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		if (userCardRelations.Count == 0)
 		{
 			_logger.Debug($"No cards found for user {handler.AuthorizedUser.Username}");
-			return new Result(true, "No cards found for user!", statusCode: 204);
+			return new Result(true, "", statusCode: 204);
 		}
 		List<UserCardsDatabase> cards = [];
 		foreach (var userCardRelation in userCardRelations)

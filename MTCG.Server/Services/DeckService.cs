@@ -21,7 +21,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		if (cardIds.Count == 0)
 		{
 			_logger.Debug("No cards found in deck");
-			return new Result(true, "No cards found in deck!", statusCode: 204);
+			return new Result(true, "", statusCode: 204);
 		}
 		var deck = new Deck()
 		{

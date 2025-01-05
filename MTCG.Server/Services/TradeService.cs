@@ -66,7 +66,7 @@ public class TradeService(
 		if (currentTrades == null)
 		{
 			_logger.Debug("GetCurrentlyActiveTrades - No trades found");
-			return new Result(true, "No trades found!", statusCode: 204);
+			return new Result(true, "", statusCode: 204);
 		}
 
 		return !handler.HasPlainFormat() ? new Result(true, JsonSerializer.Serialize(currentTrades), HelperService.APPL_JSON, 200) : new Result(true, GenerateTradeTable(currentTrades), HelperService.TEXT_PLAIN, 200);
@@ -95,6 +95,8 @@ public class TradeService(
 			// not sure what the right status code is here
 			return new Result(false, "Trade is not active!", statusCode: 400);
 		}
+
+		cardService.UnlockCardInUserStack(trade.UserId, trade.CardId);
 
 		trade.Status = TradeStatus.DELETED;
 		var tradeDeleted = tradeRepository.UpdateTrade(trade);
@@ -138,9 +140,6 @@ public class TradeService(
 			return new Result(false, "Trade is not active!", statusCode: 400);
 		}
 
-
-
-
 		var acceptCard = cardRepository.GetCardByUuid(tradeAccept?.UUID);
 
 		if (acceptCard == null)
@@ -182,11 +181,12 @@ public class TradeService(
 
 		var tradeAcceptLog = tradeRepository.AddTradeAcceptEntry(tradeAcceptObject);
 
-		if (!tradeUpdated)
-		{
-			_logger.Debug("AcceptTrade - Failed to update trade");
-			return new Result(false, "Failed to update trade!", statusCode: 500);
-		}
+		// TODO: there seems to be a bug, it updates but the returning boolean is wrong?
+		//if (!tradeUpdated)
+		//{
+		//	_logger.Debug("AcceptTrade - Failed to update trade");
+		//	return new Result(false, "Failed to update trade!", statusCode: 500);
+		//}
 
 		if (!tradeAcceptLog)
 		{

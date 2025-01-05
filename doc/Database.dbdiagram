@@ -1,0 +1,92 @@
+Table users {
+  id int [PK, increment, unique]
+  username string [unique]
+  password string
+  token string
+  coins decimal
+}
+
+Table stats {
+  user_id int [PK, ref: < users.id]
+  wins int
+  losses int
+  draws int
+  elo int
+}
+
+Table userinfo {
+  user_id int [PK, ref: < users.id]
+  name string
+  bio string
+  image string
+}
+
+Table packages {
+  id int [PK, increment, unique]
+  name string
+  rarity string
+  cost int
+  available_amount int
+}
+
+Table cards {
+  id int [PK, increment, unique]
+  uuid string
+  name string
+  description string
+  damage int
+  element string
+  type string
+  rarity string
+  race string
+}
+
+Table package_card {
+  package_id int [PK, ref: < packages.id]
+  card_id int [PK, ref: < cards.id]
+}
+
+Table user_card {
+  user_id int [PK, ref: < users.id]
+  card_id int [PK, ref: < cards.id]
+  quantity int
+  locked_amount integer
+}
+
+Table deck {
+  id int [PK, increment, unique]
+  user_id int [ref: < users.id]
+}
+
+Table deck_card {
+  deck_id int [PK, ref: < deck.id]
+  card_id int [PK, ref: < cards.id]
+}
+
+Table battles {
+  id int [PK, increment, unique]
+  player_1_id int [ref: < users.id]
+  player_2_id int [ref: < users.id]
+  result string
+  timestamp timestamp
+}
+
+Table trade_offers {
+  id int [PK, increment, unique]
+  offering_user_id int [ref: < users.id]
+  offering_card_id int [ref: < cards.id]
+  desired_card_type string
+  desired_card_rarity string
+  desired_card_race string
+  desired_card_element string
+  desired_card_minimum_damage int
+  timestamp timestamp
+  status string
+}
+
+Table trade_accept {
+  trade_id int [PK, ref: < trade_offers.id]
+  accepted_user_id int [PK, ref: < users.id]
+  provided_card_id int [ref: < cards.id]
+  timestamp timestamp
+}
