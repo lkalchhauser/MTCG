@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using System.Data;
 
-namespace MTCG.Server.Services;
+namespace MTCG.Server.Util;
 
 public class DatabaseConnection : IDisposable
 {

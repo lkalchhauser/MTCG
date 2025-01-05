@@ -96,8 +96,8 @@ public class BattleServiceTests
 	{
 		var player1 = CreateMockHandler("Player1", 1);
 		var player2 = CreateMockHandler("Player2", 2);
-		var player1Deck = CreateDeck(4, 15); // Higher damage (winner) cards
-		var player2Deck = CreateDeck(4, 10); // Lower damage (loser) cards
+		var player1Deck = CreateDeck(4, 15); // higher damage (winner) cards
+		var player2Deck = CreateDeck(4, 10); // lower damage (loser) cards
 
 		_deckService.GetDeckForCurrentUser(player1, true)
 			.Returns(new Result(true, JsonSerializer.Serialize(player1Deck), "application/json"));
@@ -147,8 +147,8 @@ public class BattleServiceTests
 
 		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromMilliseconds(100), _deckService, _cardService);
 
-		Assert.That(!result.Success);
-		Assert.That(result.Message.Contains("Timeout"));
+		Assert.That(result.Success, Is.False);
+		Assert.That(result.Message, Does.Contain("Timeout"));
 	}
 
 	[Test]
@@ -162,8 +162,8 @@ public class BattleServiceTests
 
 		var result = await _battleService.WaitForBattleAsync(player1, TimeSpan.FromSeconds(5), _deckService, _cardService);
 
-		Assert.That(!result.Success);
-		Assert.That(result.Message.Contains("Deck must contain exactly 4 cards"));
+		Assert.That(result.Success, Is.False);
+		Assert.That(result.Message, Does.Contain("Deck must contain exactly 4 cards"));
 	}
 
 	[Test]
@@ -193,13 +193,11 @@ public class BattleServiceTests
 		var result1 = await task1;
 		var result2 = await task2;
 
-		Assert.That(result1.Success);
-		Assert.That(result2.Success);
-		Assert.That(result1.Message.Contains("DRAW") && result2.Message.Contains("DRAW"));
+		Assert.That(result1.Success, Is.True);
+		Assert.That(result2.Success, Is.True);
+		Assert.That(result1.Message, Does.Contain("DRAW"));
+		Assert.That(result2.Message, Does.Contain("DRAW"));
 	}
-
-
-
 
 	[Test]
 	public void FightRound_DemonManipulatesHumanRule_AppliesCorrectly()
