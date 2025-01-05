@@ -6,20 +6,23 @@ using System.Data;
 
 namespace MTCG.Server.Repositories;
 
-public class CardRepository : ICardRepository
+/**
+ * This class is responsible for handling all database operations related to cards
+ *	<param name="dbConn">The database connection</param>
+ */
+public class CardRepository(DatabaseConnection dbConn) : ICardRepository
 {
-	private readonly DatabaseConnection _dbConn;
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public CardRepository(DatabaseConnection dbConn)
-	{
-		_dbConn = dbConn;
-	}
-
+	/**
+	 * Adds a card to the database
+	 *	<param name="card">The card to add</param>
+	 *	<returns>The id of the added card</returns>
+	 */
 	public int AddCard(Card card)
 	{
 		_logger.Debug($"Adding card \"{card.Name}\" to the DB");
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			INSERT INTO cards (uuid, name, description, damage, element, type, rarity, race)
 			VALUES (@uuid, @name, @description, @damage, @element, @type, @rarity, @race)
 			RETURNING id
@@ -36,10 +39,15 @@ public class CardRepository : ICardRepository
 		return card.Id;
 	}
 
+	/**
+	 * Gets a card by its id
+	 *	<param name="id">The id of the card</param>
+	 *	<returns>The card with the given id</returns>
+	 */
 	public Card? GetCardById(int id)
 	{
 		_logger.Debug($"Getting card with \"{id}\" from the DB");
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM cards
 			WHERE id = @id
@@ -67,10 +75,15 @@ public class CardRepository : ICardRepository
 		return card;
 	}
 
+	/**
+	 * Gets a card by its uuid
+	 *	<param name="uuid">The uuid of the card</param>
+	 *	<returns>The card with the given uuid</returns>
+	 */
 	public Card? GetCardByUuid(string uuid)
 	{
 		_logger.Debug($"Getting card with uuid \"{uuid}\" from the DB");
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM cards
 			WHERE uuid = @uuid
@@ -97,10 +110,16 @@ public class CardRepository : ICardRepository
 		return card;
 	}
 
+	/**
+	 *	Adds a card to a user's stack
+	 *	<param name="userId">the id of the user to add the card to</param>
+	 *	<param name="cardId">the id of the card to add to the stack</param>
+	 *	<returns>true if card was successfully added</returns>
+	 */
 	public bool AddNewCardToUserStack(int userId, int cardId)
 	{
 		_logger.Debug($"Adding 1 card \"{cardId}\" to user \"{userId}\"");
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			INSERT INTO user_card (user_id, card_id)
 			VALUES (@user_id, @card_id)
 			""");
@@ -109,9 +128,16 @@ public class CardRepository : ICardRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
+	/**
+	 * Gets the user-card relation
+	 *	<param name="userId">The id of the user</param>
+	 * <param name="cardId">The id of the card</param>
+	 *	<returns>The UserCardRelation of the given user & card</returns>
+	 */
 	public UserCardRelation? GetUserCardRelation(int userId, int cardId)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Getting user card relation for card \"{cardId}\" and user \"{userId}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM user_card
 			WHERE user_id = @user_id
@@ -134,9 +160,15 @@ public class CardRepository : ICardRepository
 		return null;
 	}
 
+	/**
+	 * Gets all card relations for a user
+	 *	<param name="userId">The id of the user</param>
+	 *	<returns>A list of all card relations for the given user</returns>
+	 */
 	public List<UserCardRelation> GetAllCardRelationsForUserId(int userId)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Getting all card relations for user \"{userId}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM user_card
 			WHERE user_id = @user_id
@@ -157,9 +189,15 @@ public class CardRepository : ICardRepository
 		return cardIds;
 	}
 
-	public bool UpdateUserStack(UserCardRelation userCardRelation)
+	/**
+	 * Updates the user-card relation
+	 *	<param name="userCardRelation">The user-card relation to update</param>
+	 *	<returns>true if the relation was successfully updated</returns>
+	 */
+	public bool UpdateUserCardRelation(UserCardRelation userCardRelation)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Updating user card relation for card \"{userCardRelation.CardId}\" and user \"{userCardRelation.UserId}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			UPDATE user_card
 			SET quantity = @quantity, locked_amount = @locked_amount
 			WHERE user_id = @user_id
@@ -172,9 +210,15 @@ public class CardRepository : ICardRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
+	/**
+	 * Removes a card from a user's stack
+	 *	<param name="userCardRelation">The user-card relation to remove</param>
+	 *	<returns>true if the card was successfully removed</returns>
+	 */
 	public bool RemoveCardUserStack(UserCardRelation userCardRelation)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Removing card \"{userCardRelation.CardId}\" from user \"{userCardRelation.UserId}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			DELETE FROM user_card
 			WHERE user_id = @user_id
 			AND card_id = @card_id

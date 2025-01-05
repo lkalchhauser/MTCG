@@ -3,12 +3,9 @@ using MTCG.Server.Util;
 
 namespace MTCG.Server.Repositories;
 
-public class TransactionRepository : ITransactionRepository
+// Currently unused, but I'm leaving it in for possible further use
+public class TransactionRepository(DatabaseConnection dbConn) : ITransactionRepository
 {
-	private readonly DatabaseConnection _dbConn;
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	public TransactionRepository(DatabaseConnection dbConn)
-	{
-		_dbConn = dbConn;
-	}
+	private readonly DatabaseConnection _dbConn = dbConn;
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 }

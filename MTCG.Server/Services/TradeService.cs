@@ -180,7 +180,7 @@ public class TradeService(
 			ProvidedCardId = acceptCard.Id
 		};
 
-		var tradeAcceptLog = tradeRepository.AddTradeAcceptEntry(handler, tradeAcceptObject);
+		var tradeAcceptLog = tradeRepository.AddTradeAcceptEntry(tradeAcceptObject);
 
 		if (!tradeUpdated)
 		{

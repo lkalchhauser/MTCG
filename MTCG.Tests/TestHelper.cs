@@ -2,7 +2,6 @@
 using MTCG.Server.Models;
 using MTCG.Server.Util.Enums;
 using NSubstitute;
-using NUnit.Framework;
 
 namespace MTCG.Tests
 {
@@ -60,7 +59,7 @@ namespace MTCG.Tests
 			};
 		}
 
-		public static UserCredentials CreateSimpleUser (int id, string username = "User1", int coins = 100, string password = "password123")
+		public static UserCredentials CreateSimpleUser(int id, string username = "User1", int coins = 100, string password = "password123")
 		{
 			return new UserCredentials
 			{

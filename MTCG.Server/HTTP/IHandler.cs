@@ -17,7 +17,7 @@ public interface IHandler
 	public UserCredentials AuthorizedUser { get; set; }
 
 	public void Handle(TcpClient client);
-	public void FormatPath(string path);
+	public void FormatQueryParams(string path);
 	public void Reply(int statusCode = 200, string? body = null, string? contentType = HelperService.TEXT_PLAIN);
 	public string GetContentType();
 	public string GetAuthorizationToken();

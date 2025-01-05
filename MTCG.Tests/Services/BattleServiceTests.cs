@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
@@ -8,6 +7,7 @@ using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
 using NSubstitute;
 using NUnit.Framework;
+using System.Text.Json;
 
 namespace MTCG.Tests.Services;
 

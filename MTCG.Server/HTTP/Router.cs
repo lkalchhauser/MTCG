@@ -2,9 +2,13 @@
 
 namespace MTCG.Server.HTTP;
 
+/**
+ *	Handles incoming Requests and Routes them to the correct Service
+ */
 public class Router
 {
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
 	private readonly IUserService _userService;
 	private readonly ICardService _cardService;
 	private readonly ITransactionService _transactionService;
@@ -54,9 +58,9 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var getCardsResult = _cardService.ShowAllCardsForUser(handler);
 						handler.Reply(getCardsResult.StatusCode, getCardsResult.Message, getCardsResult.ContentType);
-						// return all cards
 						break;
 					case { } s when s.StartsWith("/deck"):
 						_logger.Debug("Routing GET /deck");
@@ -65,6 +69,7 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var userDeckResult = _deckService.GetDeckForCurrentUser(handler);
 						handler.Reply(userDeckResult.StatusCode, userDeckResult.Message, userDeckResult.ContentType);
 						break;
@@ -75,11 +80,18 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var userStatsResult = _userService.GetUserStats(handler);
 						handler.Reply(userStatsResult.StatusCode, userStatsResult.Message, userStatsResult.ContentType);
 						break;
 					case "/scoreboard":
 						_logger.Debug("Routing GET /scoreboard");
+						if (!_userService.IsUserAuthorized(handler))
+						{
+							handler.Reply(401);
+							break;
+						}
+
 						var getScoreboardResult = _userService.GetScoreboard(handler);
 						handler.Reply(getScoreboardResult.StatusCode, getScoreboardResult.Message, getScoreboardResult.ContentType);
 						break;
@@ -95,6 +107,7 @@ public class Router
 						handler.Reply(getAllTradesResult.StatusCode, getAllTradesResult.Message, getAllTradesResult.ContentType);
 						break;
 					default:
+						_logger.Debug($"GET 404: {handler.Path}");
 						handler.Reply(404);
 						break;
 				}
@@ -104,11 +117,13 @@ public class Router
 				{
 					case "/users":
 						_logger.Debug("Routing POST /user");
+
 						var userRegisterResult = _userService.RegisterUser(handler);
 						handler.Reply(userRegisterResult.StatusCode, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
 						_logger.Debug("Routing POST /sessions");
+
 						var userLoginResult = _userService.LoginUser(handler);
 						handler.Reply(userLoginResult.StatusCode, userLoginResult.Message, userLoginResult.ContentType);
 						break;
@@ -120,6 +135,7 @@ public class Router
 							handler.Reply(403);
 							return;
 						}
+
 						handler.AuthorizedUser = authUser;
 						var createPackageResult = _cardService.CreatePackageAndCards(handler);
 						handler.Reply(createPackageResult.StatusCode, createPackageResult.Message, createPackageResult.ContentType);
@@ -131,6 +147,7 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var getPackageResult = _transactionService.GetRandomPackageForUser(handler);
 						handler.Reply(getPackageResult.StatusCode, getPackageResult.Message, getPackageResult.ContentType);
 						break;
@@ -142,7 +159,7 @@ public class Router
 							break;
 						}
 
-						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1), _deckService, _cardService);
+						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1));
 						handler.Reply(battleRequestResult.StatusCode, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/tradings/"):
@@ -152,6 +169,7 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var acceptTradingOffer = _tradingService.AcceptTradeOffer(handler);
 						handler.Reply(acceptTradingOffer.StatusCode, acceptTradingOffer.Message, acceptTradingOffer.ContentType);
 						break;
@@ -162,10 +180,12 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var createTradingOffer = _tradingService.CreateTradeOffer(handler);
 						handler.Reply(createTradingOffer.StatusCode, createTradingOffer.Message, createTradingOffer.ContentType);
 						break;
 					default:
+						_logger.Debug($"POST 404: {handler.Path}");
 						handler.Reply(404);
 						break;
 				}
@@ -191,6 +211,7 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var updatePasswordResult = _userService.UpdatePassword(handler);
 						handler.Reply(updatePasswordResult.StatusCode, updatePasswordResult.Message, updatePasswordResult.ContentType);
 						break;
@@ -205,6 +226,10 @@ public class Router
 						var addOrUpdateUserInfoResult = _userService.AddOrUpdateUserInfo(handler);
 						handler.Reply(addOrUpdateUserInfoResult.StatusCode, addOrUpdateUserInfoResult.Message, addOrUpdateUserInfoResult.ContentType);
 						break;
+					default:
+						_logger.Debug($"PUT 404: {handler.Path}");
+						handler.Reply(404);
+						break;
 				}
 				break;
 			case "DELETE":
@@ -217,6 +242,7 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var deleteUserInfoResult = _userService.DeleteUserInfo(handler);
 						handler.Reply(deleteUserInfoResult.StatusCode, deleteUserInfoResult.Message, deleteUserInfoResult.ContentType);
 						break;
@@ -227,8 +253,13 @@ public class Router
 							handler.Reply(401);
 							break;
 						}
+
 						var deleteTradeResult = _tradingService.DeleteTrade(handler);
 						handler.Reply(deleteTradeResult.StatusCode, deleteTradeResult.Message, deleteTradeResult.ContentType);
+						break;
+					default:
+						_logger.Debug($"DELETE 404: {handler.Path}");
+						handler.Reply(404);
 						break;
 				}
 				break;

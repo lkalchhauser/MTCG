@@ -1,11 +1,10 @@
-﻿using System.Text.Json;
+﻿using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
-using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Services;
+using MTCG.Server.Services.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
-using MTCG.Server.HTTP;
-using MTCG.Server.Models;
+using System.Text.Json;
 
 namespace MTCG.Tests.Services;
 

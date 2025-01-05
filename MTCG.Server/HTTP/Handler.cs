@@ -31,6 +31,10 @@ public class Handler : IHandler
 		_helperService = helperService;
 	}
 
+	/**
+	 *	Handles the request from the TcpClient
+	 *	This parses the request and adds any needed properties to the Handler class
+	 */
 	public void Handle(TcpClient client)
 	{
 		_logger.Debug("Handling request");
@@ -56,7 +60,7 @@ public class Handler : IHandler
 			{
 				var splitLines = requestLines[0].Split(" ");
 				Method = splitLines[0];
-				FormatPath(splitLines[1]);
+				FormatQueryParams(splitLines[1]);
 			}
 			else if (inlineHeaders)
 			{
@@ -71,15 +75,20 @@ public class Handler : IHandler
 			}
 			else
 			{
-				// is this the correct way - without content-length?
 				Payload += requestLines[i] + "\r\n";
 			}
 
 			Headers = headers.ToArray();
+
+			//_logger.Debug($"Headers: {JsonSerializer.Serialize(Headers)}, Path: {JsonSerializer.Serialize(Path)}, Payload: {JsonSerializer.Serialize(Payload)}");
 		}
 	}
 
-	public void FormatPath(string path)
+	/**
+	 * Gets all the query params from the path and adds them to the QueryParams list
+	 *	<param name="path">The path to format</param>>
+	 */
+	public void FormatQueryParams(string path)
 	{
 		if (path.Contains('?'))
 		{
@@ -115,6 +124,12 @@ public class Handler : IHandler
 		}
 	}
 
+	/**
+	 * Replies to the request with the given status code, body and content type
+	 *	<param name="statusCode">The status code to reply with</param>
+	 *	<param name="body">The body to reply with</param>
+	 *	<param name="contentType">The content type to reply with</param>
+	 */
 	public async void Reply(int statusCode = 200, string? body = null, string? contentType = HelperService.TEXT_PLAIN)
 	{
 		_logger.Debug("Replying to request");
@@ -141,6 +156,9 @@ public class Handler : IHandler
 		Client.Dispose();
 	}
 
+	/**
+	 * Gets the content type from the headers
+	 */
 	public string GetContentType()
 	{
 		foreach (var httpHeader in Headers)
@@ -153,6 +171,9 @@ public class Handler : IHandler
 		return "";
 	}
 
+	/**
+	 * Gets the authorization token from the headers
+	 */
 	public string GetAuthorizationToken()
 	{
 		foreach (var httpHeader in Headers)
@@ -165,6 +186,9 @@ public class Handler : IHandler
 		return "";
 	}
 
+	/**
+	 * Checks if the query params contain a format of plain
+	 */
 	public bool HasPlainFormat()
 	{
 		return QueryParams.Any(param => param is { Key: "format", Value: "plain" });

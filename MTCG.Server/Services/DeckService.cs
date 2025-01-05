@@ -78,9 +78,20 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 			cards.Add(card);
 		}
 
-
+		// TODO what if user doesnt have deck
 		var currentDeckResult = GetDeckForCurrentUser(handler);
-		var currentDeckCards = JsonSerializer.Deserialize<List<Card>>(currentDeckResult.Message);
+		List<Card> currentDeckCards = [];
+
+		if (currentDeckResult.StatusCode != 204)
+		{
+			currentDeckCards = JsonSerializer.Deserialize<List<Card>>(currentDeckResult.Message);
+		}
+		else
+		{
+			currentDeckCards = [];
+		}
+
+
 
 		// we go through it again instead of doing it in the one above so we can have proper error logging
 		foreach (var card in cards.Where(card => !IsCardAvailableForUser(card, handler.AuthorizedUser, currentDeckCards)))
@@ -101,7 +112,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		{
 			var userCardRelation = cardRepository.GetUserCardRelation(handler.AuthorizedUser.Id, card.Id);
 			userCardRelation.LockedAmount++;
-			cardRepository.UpdateUserStack(userCardRelation);
+			cardRepository.UpdateUserCardRelation(userCardRelation);
 			deckRepository.AddCardToDeck(createdDeckId, card.Id);
 		}
 
@@ -114,7 +125,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		{
 			var relation = cardRepository.GetUserCardRelation(user.Id, card.Id);
 			relation.LockedAmount--;
-			cardRepository.UpdateUserStack(relation);
+			cardRepository.UpdateUserCardRelation(relation);
 		}
 		deckRepository.DeleteDeckById(deckId);
 	}

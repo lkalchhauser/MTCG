@@ -1,28 +1,29 @@
-﻿using MTCG.Server.HTTP;
-using MTCG.Server.Models;
+﻿using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using System.Data;
+using System.Text.Json;
 
 namespace MTCG.Server.Repositories;
 
-public class TradeRepository : ITradeRepository
+/*
+ *	Repository for handling all database operations related to trades.
+ */
+public class TradeRepository(DatabaseConnection dbConn, IHelperService helperService) : ITradeRepository
 {
-	private readonly DatabaseConnection _dbConn;
-	private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private readonly IHelperService _helperService;
+	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	public TradeRepository(DatabaseConnection dbConn, IHelperService helperService)
-	{
-		_dbConn = dbConn;
-		_helperService = helperService;
-	}
-
+	/**
+	 * Adds a trade offer to the database.
+	 *	<param name="tradeOffer">The trade offer to add</param>
+	 *	<returns>True if the trade offer was added, false otherwise</returns>
+	 */
 	public bool AddTradeOffer(TradeOffer tradeOffer)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Adding trade offer: \"{JsonSerializer.Serialize(tradeOffer)}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			INSERT INTO trade_offers (offering_user_id, offered_card_id, desired_card_type, desired_card_rarity, desired_card_race, desired_card_element, desired_card_minimum_damage)
 			VALUES (@offering_user_id, @offered_card_id, @desired_card_type, @desired_card_rarity, @desired_card_race, @desired_card_element, @desired_card_minimum_damage)
 			""");
@@ -36,9 +37,15 @@ public class TradeRepository : ITradeRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
+	/**
+	 * Gets all trades with a given status.
+	 *	<param name="status">The status of the trades</param>
+	 *	<returns>A list of all trades with the given status</returns>
+	 */
 	public List<TradeOffer>? GetAllTradesWithStatus(TradeStatus status)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Getting all trades with status \"{status}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM trade_offers
 			WHERE status = @status
@@ -53,19 +60,26 @@ public class TradeRepository : ITradeRepository
 				Id = reader.GetInt32(0),
 				UserId = reader.GetInt32(1),
 				CardId = reader.GetInt32(2),
-				DesiredCardType = _helperService.ParseEnumOrNull<CardType>(reader.GetString(4)),
-				DesiredCardRarity = _helperService.ParseEnumOrNull<Rarity>(reader.GetString(4)),
-				DesiredCardRace = _helperService.ParseEnumOrNull<Race>(reader.GetString(5)),
-				DesiredCardElement = _helperService.ParseEnumOrNull<Element>(reader.GetString(6)),
+				DesiredCardType = helperService.ParseEnumOrNull<CardType>(reader.GetString(4)),
+				DesiredCardRarity = helperService.ParseEnumOrNull<Rarity>(reader.GetString(4)),
+				DesiredCardRace = helperService.ParseEnumOrNull<Race>(reader.GetString(5)),
+				DesiredCardElement = helperService.ParseEnumOrNull<Element>(reader.GetString(6)),
 				DesiredCardMinimumDamage = reader.GetInt32(7)
 			});
 		}
 		return tradeOffers;
 	}
 
+	/**
+	 * Gets all trades with a given status and a desired card type.
+	 *	<param name="status">The status of the trades</param>
+	 *	<param name="desiredCardType">The desired card type</param>
+	 *	<returns>A list of all trades with the given status and desired card type</returns>
+	 */
 	public TradeOffer? GetTradeById(int tradeId)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Getting trade with id \"{tradeId}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			SELECT *
 			FROM trade_offers
 			WHERE id = @trade_id
@@ -79,20 +93,26 @@ public class TradeRepository : ITradeRepository
 			Id = reader.GetInt32(0),
 			UserId = reader.GetInt32(1),
 			CardId = reader.GetInt32(2),
-			DesiredCardType = _helperService.ParseEnumOrNull<CardType>(reader.GetString(3)),
-			DesiredCardRarity = _helperService.ParseEnumOrNull<Rarity>(reader.GetString(4)),
-			DesiredCardRace = _helperService.ParseEnumOrNull<Race>(reader.GetString(5)),
-			DesiredCardElement = _helperService.ParseEnumOrNull<Element>(reader.GetString(6)),
+			DesiredCardType = helperService.ParseEnumOrNull<CardType>(reader.GetString(3)),
+			DesiredCardRarity = helperService.ParseEnumOrNull<Rarity>(reader.GetString(4)),
+			DesiredCardRace = helperService.ParseEnumOrNull<Race>(reader.GetString(5)),
+			DesiredCardElement = helperService.ParseEnumOrNull<Element>(reader.GetString(6)),
 			DesiredCardMinimumDamage = reader.GetInt32(7),
-			Status = _helperService.ParseEnumOrNull<TradeStatus>(reader.GetString(9))
+			Status = helperService.ParseEnumOrNull<TradeStatus>(reader.GetString(9))
 		};
 
 		return tradeOffer;
 	}
 
+	/**
+	 * Updates a trade offer in the database.
+	 *	<param name="trade">The trade offer to update</param>
+	 *	<returns>True if the trade offer was updated, false otherwise</returns>
+	 */
 	public bool UpdateTrade(TradeOffer trade)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Updating trade: \"{JsonSerializer.Serialize(trade)}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			UPDATE trade_offers
 			SET offering_user_id = @offering_user_id, offered_card_id = @offered_card_id, desired_card_type = @desired_card_type, desired_card_rarity = @desired_card_rarity, desired_card_race = @desired_card_race, desired_card_element = @desired_card_element, desired_card_minimum_damage = @desired_card_minimum_damage, status = @status
 			WHERE offering_user_id = @offering_user_id
@@ -109,9 +129,15 @@ public class TradeRepository : ITradeRepository
 		return dbCommand.ExecuteNonQuery() == 1;
 	}
 
-	public bool AddTradeAcceptEntry(IHandler handler, TradeAccept tradeAccept)
+	/**
+	 * Adds a trade accept entry to the database.
+	 *	<param name="tradeAccept">The trade accept entry to add</param>
+	 *	<returns>True if the trade accept entry was added, false otherwise</returns>
+	 */
+	public bool AddTradeAcceptEntry(TradeAccept tradeAccept)
 	{
-		using IDbCommand dbCommand = _dbConn.CreateCommand("""
+		_logger.Debug($"Adding trade accept entry: \"{JsonSerializer.Serialize(tradeAccept)}\"");
+		using IDbCommand dbCommand = dbConn.CreateCommand("""
 			INSERT INTO trade_accept (trade_id, accepted_user_id, provided_card_id)
 			VALUES (@trade_id, @accepted_user_id, @provided_card_id)
 			""");

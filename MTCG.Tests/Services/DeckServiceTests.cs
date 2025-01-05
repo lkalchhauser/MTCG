@@ -1,13 +1,9 @@
-﻿using System.Text.Json;
-using MTCG.Server.Models;
+﻿using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
-using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Services;
-using MTCG.Server.Util.Enums;
+using MTCG.Server.Services.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
-using MTCG.Server.HTTP;
-using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Tests.Services;
 
@@ -78,10 +74,10 @@ public class DeckServiceTests
 		var card3 = TestHelper.CreateSimpleCard(3, "uuid3");
 		var card4 = TestHelper.CreateSimpleCard(4, "uuid4");
 
-		var userCardRelation1 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 1, UserId = 1};
-		var userCardRelation2 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 2, UserId = 1};
-		var userCardRelation3 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 3, UserId = 1};
-		var userCardRelation4 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 4, UserId = 1};
+		var userCardRelation1 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 1, UserId = 1 };
+		var userCardRelation2 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 2, UserId = 1 };
+		var userCardRelation3 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 3, UserId = 1 };
+		var userCardRelation4 = new UserCardRelation { Quantity = 2, LockedAmount = 0, CardId = 4, UserId = 1 };
 
 		_cardRepository.GetCardByUuid("uuid1").Returns(card1);
 		_cardRepository.GetCardByUuid("uuid2").Returns(card2);

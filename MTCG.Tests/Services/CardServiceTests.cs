@@ -3,7 +3,6 @@ using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Services.Interfaces;
-using MTCG.Server.Util.Enums;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -120,13 +119,13 @@ public class CardServiceTests
 		var cardId = 1;
 		var relation = new UserCardRelation { Quantity = 2, LockedAmount = 0 };
 		_cardRepository.GetUserCardRelation(userId, cardId).Returns(relation);
-		_cardRepository.UpdateUserStack(Arg.Any<UserCardRelation>()).Returns(true);
+		_cardRepository.UpdateUserCardRelation(Arg.Any<UserCardRelation>()).Returns(true);
 
 		var result = _cardService.RemoveCardFromUserStack(userId, cardId);
 
 		Assert.That(result, Is.True);
 		Assert.That(relation.Quantity, Is.EqualTo(1));
-		_cardRepository.Received(1).UpdateUserStack(relation);
+		_cardRepository.Received(1).UpdateUserCardRelation(relation);
 	}
 
 	[Test]
@@ -136,13 +135,13 @@ public class CardServiceTests
 		var cardId = 1;
 		var relation = new UserCardRelation { Quantity = 2, LockedAmount = 2 };
 		_cardRepository.GetUserCardRelation(userId, cardId).Returns(relation);
-		_cardRepository.UpdateUserStack(Arg.Any<UserCardRelation>()).Returns(true);
+		_cardRepository.UpdateUserCardRelation(Arg.Any<UserCardRelation>()).Returns(true);
 
 		var result = _cardService.RemoveCardFromUserStack(userId, cardId);
 
 		Assert.That(result, Is.False);
 		Assert.That(relation.Quantity, Is.EqualTo(2));
-		_cardRepository.Received(0).UpdateUserStack(relation);
+		_cardRepository.Received(0).UpdateUserCardRelation(relation);
 	}
 
 	[Test]
@@ -152,13 +151,13 @@ public class CardServiceTests
 		var cardId = 1;
 		var relation = new UserCardRelation { Quantity = 2, LockedAmount = 0 };
 		_cardRepository.GetUserCardRelation(userId, cardId).Returns(relation);
-		_cardRepository.UpdateUserStack(Arg.Any<UserCardRelation>()).Returns(true);
+		_cardRepository.UpdateUserCardRelation(Arg.Any<UserCardRelation>()).Returns(true);
 
 		var result = _cardService.LockCardInUserStack(userId, cardId);
 
 		Assert.That(result, Is.True);
 		Assert.That(relation.LockedAmount, Is.EqualTo(1));
-		_cardRepository.Received(1).UpdateUserStack(relation);
+		_cardRepository.Received(1).UpdateUserCardRelation(relation);
 	}
 
 	[Test]
@@ -168,20 +167,20 @@ public class CardServiceTests
 		var cardId = 1;
 		var relation = new UserCardRelation { Quantity = 2, LockedAmount = 1 };
 		_cardRepository.GetUserCardRelation(userId, cardId).Returns(relation);
-		_cardRepository.UpdateUserStack(Arg.Any<UserCardRelation>()).Returns(true);
+		_cardRepository.UpdateUserCardRelation(Arg.Any<UserCardRelation>()).Returns(true);
 
 		var result = _cardService.UnlockCardInUserStack(userId, cardId);
 
 		Assert.That(result, Is.True);
 		Assert.That(relation.LockedAmount, Is.EqualTo(0));
-		_cardRepository.Received(1).UpdateUserStack(relation);
+		_cardRepository.Received(1).UpdateUserCardRelation(relation);
 	}
 
 	[Test]
 	public void ShowAllCardsForUser_WithNoCards_ReturnsNoCardsMessage()
 	{
 		var handler = Substitute.For<IHandler>();
-		handler.AuthorizedUser.Returns(new UserCredentials() { Coins = 100, Id = 1, Password = "password", Username = "username"});
+		handler.AuthorizedUser.Returns(new UserCredentials() { Coins = 100, Id = 1, Password = "password", Username = "username" });
 
 		_cardRepository.GetAllCardRelationsForUserId(1).Returns([]);
 

@@ -10,6 +10,6 @@ public interface ICardRepository
 	public bool AddNewCardToUserStack(int userId, int cardId);
 	public UserCardRelation? GetUserCardRelation(int userId, int cardId);
 	public List<UserCardRelation> GetAllCardRelationsForUserId(int userId);
-	public bool UpdateUserStack(UserCardRelation userCardRelation);
+	public bool UpdateUserCardRelation(UserCardRelation userCardRelation);
 	public bool RemoveCardUserStack(UserCardRelation userCardRelation);
 }

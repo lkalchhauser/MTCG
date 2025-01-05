@@ -1,9 +1,6 @@
-﻿using MTCG.Server.HTTP;
-using MTCG.Server.Models;
-using MTCG.Server.Services;
+﻿using MTCG.Server.Services;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util.Enums;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace MTCG.Tests.Services;

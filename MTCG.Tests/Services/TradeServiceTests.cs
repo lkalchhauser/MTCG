@@ -1,12 +1,12 @@
-﻿using System.Text.Json;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
+using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
-using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Services;
+using MTCG.Server.Services.Interfaces;
+using MTCG.Server.Util.Enums;
 using NSubstitute;
 using NUnit.Framework;
-using MTCG.Server.Models;
-using MTCG.Server.Util.Enums;
+using System.Text.Json;
 
 namespace MTCG.Tests.Services;
 
@@ -230,7 +230,7 @@ public class TradeServiceTests
 		_cardService.UnlockCardInUserStack(Arg.Any<int>(), Arg.Any<int>()).Returns(true);
 
 		_tradeRepository.UpdateTrade(Arg.Any<TradeOffer>()).Returns(true);
-		_tradeRepository.AddTradeAcceptEntry(Arg.Any<IHandler>(), Arg.Any<TradeAccept>()).Returns(true);
+		_tradeRepository.AddTradeAcceptEntry(Arg.Any<TradeAccept>()).Returns(true);
 
 		var result = _tradeService.AcceptTradeOffer(_handler);
 
@@ -262,7 +262,7 @@ public class TradeServiceTests
 		_cardService.UnlockCardInUserStack(Arg.Any<int>(), Arg.Any<int>()).Returns(true);
 
 		_tradeRepository.UpdateTrade(Arg.Any<TradeOffer>()).Returns(true);
-		_tradeRepository.AddTradeAcceptEntry(Arg.Any<IHandler>(), Arg.Any<TradeAccept>()).Returns(true);
+		_tradeRepository.AddTradeAcceptEntry(Arg.Any<TradeAccept>()).Returns(true);
 
 		var result = _tradeService.AcceptTradeOffer(_handler);
 
