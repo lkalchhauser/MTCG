@@ -31,20 +31,6 @@ public class BattleServiceTests
 		_battleService = new BattleService(_deckRepository, _deckService, _cardService, _userService);
 	}
 
-	private IHandler CreateMockHandler(string username, int id)
-	{
-		var handler = Substitute.For<IHandler>();
-		handler.AuthorizedUser.Returns(new UserCredentials
-		{
-			Id = id,
-			Username = username,
-			Coins = 100,
-			Password = "password123",
-			Token = $"{username}-mtcgToken"
-		});
-		return handler;
-	}
-
 	private Card CreateMockCard(
 		int id,
 		string name,
@@ -94,8 +80,8 @@ public class BattleServiceTests
 	[TestCase(true)]
 	public async Task WaitForBattleAsync_Player1Wins_ReturnsCorrectResult(bool plainFormat)
 	{
-		var player1 = CreateMockHandler("Player1", 1);
-		var player2 = CreateMockHandler("Player2", 2);
+		var player1 = TestHelper.CreateMockHandler("Player1", 1);
+		var player2 = TestHelper.CreateMockHandler("Player2", 2);
 		var player1Deck = CreateDeck(4, 15); // higher damage (winner) cards
 		var player2Deck = CreateDeck(4, 10); // lower damage (loser) cards
 
@@ -139,7 +125,7 @@ public class BattleServiceTests
 	[Test]
 	public async Task WaitForBattleAsync_Timeout_ReturnsTimeoutResult()
 	{
-		var player1 = CreateMockHandler("Player1", 1);
+		var player1 = TestHelper.CreateMockHandler("Player1", 1);
 		var player1Deck = CreateDeck(4);
 
 		_deckService.GetDeckForCurrentUser(player1, true)
@@ -154,7 +140,7 @@ public class BattleServiceTests
 	[Test]
 	public async Task WaitForBattleAsync_InvalidDeck_ReturnsErrorResult()
 	{
-		var player1 = CreateMockHandler("Player1", 1);
+		var player1 = TestHelper.CreateMockHandler("Player1", 1);
 		var invalidDeck = CreateDeck(3); // Less than 4 cards
 
 		_deckService.GetDeckForCurrentUser(player1, true)
@@ -169,8 +155,8 @@ public class BattleServiceTests
 	[Test]
 	public async Task WaitForBattleAsync_BattleEndsInDraw_ReturnsDrawResult()
 	{
-		var player1 = CreateMockHandler("Player1", 1);
-		var player2 = CreateMockHandler("Player2", 2);
+		var player1 = TestHelper.CreateMockHandler("Player1", 1);
+		var player2 = TestHelper.CreateMockHandler("Player2", 2);
 		var player1Deck = CreateDeck(4, 10); // same damage for all cards
 		var player2Deck = CreateDeck(4, 10); // same damage for all cards
 

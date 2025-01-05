@@ -24,26 +24,12 @@ public class CardServiceTests
 		_cardService = new CardService(_cardRepository, _packageRepository);
 	}
 
-	private Card CreateCard(int id, string uuid = "uuid1", string name = "Card1", float damage = 10f)
-	{
-		return new Card
-		{
-			Id = id,
-			UUID = uuid,
-			Name = name,
-			Damage = damage,
-			Type = CardType.MONSTER,
-			Element = Element.NORMAL,
-			Rarity = Rarity.NORMAL
-		};
-	}
-
 	private Package CreatePackage(string name = "TestPackage", List<Card> cards = null)
 	{
 		return new Package
 		{
 			Name = name,
-			Cards = cards ?? [CreateCard(1)]
+			Cards = cards ?? [TestHelper.CreateSimpleCard(1)]
 		};
 	}
 
@@ -111,8 +97,8 @@ public class CardServiceTests
 		var userId = 1;
 		var cards = new List<Card>
 		{
-			CreateCard(1),
-			CreateCard(2, "uuid2", "Card2")
+			TestHelper.CreateSimpleCard(1),
+			TestHelper.CreateSimpleCard(2, "uuid2", "Card2")
 		};
 
 		_cardRepository.GetUserCardRelation(userId, 1).Returns((UserCardRelation)null);
