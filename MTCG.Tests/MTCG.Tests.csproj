@@ -21,8 +21,4 @@
     <ProjectReference Include="..\MTCG.Server\MTCG.Server.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

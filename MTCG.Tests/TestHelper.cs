@@ -25,6 +25,7 @@ namespace MTCG.Tests
 		public static IHandler CreateMockHandler(string username, int id)
 		{
 			var handler = Substitute.For<IHandler>();
+			handler.GetContentType().Returns("application/json");
 			handler.AuthorizedUser.Returns(new UserCredentials
 			{
 				Id = id,
@@ -45,6 +46,28 @@ namespace MTCG.Tests
 				UserId = userId,
 				CardUUID = cardUUID,
 				Status = status
+			};
+		}
+
+		public static Package CreateSimplePackage(int id, string name = "Package1", int cost = 10, int availableAmount = 1)
+		{
+			return new Package
+			{
+				Id = id,
+				Name = name,
+				Cost = cost,
+				AvailableAmount = availableAmount
+			};
+		}
+
+		public static UserCredentials CreateSimpleUser (int id, string username = "User1", int coins = 100, string password = "password123")
+		{
+			return new UserCredentials
+			{
+				Id = id,
+				Username = username,
+				Coins = coins,
+				Password = password
 			};
 		}
 	}
