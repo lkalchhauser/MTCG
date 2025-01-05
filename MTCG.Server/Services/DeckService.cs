@@ -1,11 +1,10 @@
-﻿using System.Text.Json;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
+using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
@@ -80,7 +79,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 			cards.Add(card);
 		}
 
-		
+
 		var currentDeckResult = GetDeckForCurrentUser(handler);
 		var currentDeckCards = JsonSerializer.Deserialize<List<Card>>(currentDeckResult.Message);
 

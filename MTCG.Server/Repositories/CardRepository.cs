@@ -1,9 +1,8 @@
-﻿using System;
-using System.Data;
-using MTCG.Server.Models;
+﻿using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Util.Enums;
+using System.Data;
 
 namespace MTCG.Server.Repositories;
 

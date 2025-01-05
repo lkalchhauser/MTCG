@@ -1,12 +1,12 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MTCG.Server.Config;
 using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
+using System.Net;
+using System.Net.Sockets;
 
 namespace MTCG.Server.HTTP;
 
@@ -45,7 +45,7 @@ public class Server
 		while (_running)
 		{
 			// TODO: add tasking/asynchronous handling
-			
+
 			_logger.Info("Waiting for a connection..");
 			var client = _tcpListener.AcceptTcpClient();
 			Task.Run(() =>
@@ -82,7 +82,7 @@ public class Server
 		services.AddScoped<IDeckService, DeckService>();
 		services.AddScoped<ITradeService, TradeService>();
 		services.AddScoped<ITransactionService, TransactionService>();
-		
+
 		services.AddScoped<IHelperService, HelperService>();
 		services.AddScoped<IHandler, Handler>();
 		services.AddScoped<Router>();

@@ -1,9 +1,4 @@
-﻿using MTCG.Server.Util.Enums;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
-using System;
-
-namespace MTCG.Server.Models;
+﻿namespace MTCG.Server.Models;
 
 public class ScoreboardUser
 {

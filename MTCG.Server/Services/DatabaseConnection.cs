@@ -1,8 +1,5 @@
-﻿using System.Data;
-using MTCG.Server.Config;
-using MTCG.Server.Models;
-using MTCG.Server.Util;
-using Npgsql;
+﻿using Npgsql;
+using System.Data;
 
 namespace MTCG.Server.Services;
 
@@ -36,7 +33,7 @@ public class DatabaseConnection : IDisposable
 		return command;
 	}
 
-	public static void AddParameterWithValue (IDbCommand command, string parameterName, DbType type, object? value)
+	public static void AddParameterWithValue(IDbCommand command, string parameterName, DbType type, object? value)
 	{
 		IDbDataParameter parameter = command.CreateParameter();
 		parameter.ParameterName = parameterName;

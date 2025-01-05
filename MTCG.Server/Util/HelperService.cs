@@ -1,12 +1,9 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Services.Interfaces;
-using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.Util;
 
 using BCrypt.Net;
-using MTCG.Server.Services;
 
 public class HelperService : IHelperService
 {

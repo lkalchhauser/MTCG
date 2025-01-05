@@ -1,11 +1,10 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using System.Text.Json;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
+using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
@@ -31,7 +30,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 			_logger.Debug("Register User - User already exists");
 			return new Result(false, "User already exists!", statusCode: 409);
 		}
-		
+
 		var hashedPassword = helperService.HashPassword(credentials.Password);
 
 		credentials.Password = hashedPassword;
@@ -148,7 +147,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 			var addUserInfoSuccessful = userRepository.AddUserInfo(newUserInfo);
 			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON, statusCode: 201) : new Result(false, "Error while adding info to database", statusCode: 400);
 		}
-		
+
 		var updateUserInfoSuccessful = userRepository.UpdateUserInfo(newUserInfo);
 		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON, statusCode: 200) : new Result(false, "Error while adding info to database", statusCode: 400);
 	}

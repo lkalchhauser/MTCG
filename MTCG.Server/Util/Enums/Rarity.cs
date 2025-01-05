@@ -5,9 +5,9 @@ namespace MTCG.Server.Util.Enums;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Rarity
 {
-    NORMAL,
-    RARE,
-    EPIC,
-    LEGENDARY,
-    MYTHIC
+	NORMAL,
+	RARE,
+	EPIC,
+	LEGENDARY,
+	MYTHIC
 }

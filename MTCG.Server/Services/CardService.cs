@@ -1,12 +1,10 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
+using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
@@ -190,7 +188,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		return new Result(true, JsonSerializer.Serialize(cards), HelperService.APPL_JSON, statusCode: 200);
 	}
 
-	public bool IsCardAvailableForUser (int cardId, int userId)
+	public bool IsCardAvailableForUser(int cardId, int userId)
 	{
 		var relation = cardRepository.GetUserCardRelation(userId, cardId);
 		return relation != null && relation.Quantity > relation.LockedAmount;

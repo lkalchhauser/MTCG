@@ -1,14 +1,13 @@
-﻿using System.Collections.Concurrent;
-using System.Text.Json;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.BattleRules;
 using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
+using System.Collections.Concurrent;
+using System.Text.Json;
 using BattleResult = MTCG.Server.Models.BattleResult;
 
 namespace MTCG.Server.Services;
@@ -45,7 +44,7 @@ public class BattleService(
 		if (_waitingPlayers.Count >= 2)
 		{
 			if (_waitingPlayers.TryDequeue(out var player1) &&
-			    _waitingPlayers.TryDequeue(out var player2))
+				 _waitingPlayers.TryDequeue(out var player2))
 			{
 				// TODO: maybe this doesnt need a battle return
 				DoBattle(player1, player2, deckService);
@@ -194,7 +193,7 @@ public class BattleService(
 		{
 			logTable += $"\nYou {result.Result}!";
 		}
-				
+
 		return new Result(true, logTable, HelperService.TEXT_PLAIN, 200);
 	}
 

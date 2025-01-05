@@ -1,12 +1,11 @@
-﻿using System.Text.Json;
-using MTCG.Server.HTTP;
+﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
+using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
@@ -43,7 +42,8 @@ public class TradeService(
 		{
 			_logger.Debug("CreateTradeOffer - Card not owned by user");
 			return new Result(false, "Card not owned by user!", statusCode: 403);
-		} else if (cardUserRelation.LockedAmount == cardUserRelation.Quantity)
+		}
+		else if (cardUserRelation.LockedAmount == cardUserRelation.Quantity)
 		{
 			_logger.Debug("CreateTradeOffer - no card available to trade");
 			return new Result(false, "No card available to trade!", statusCode: 403);
@@ -139,9 +139,9 @@ public class TradeService(
 			return new Result(false, "Trade is not active!", statusCode: 400);
 		}
 
-		
 
-		
+
+
 		var acceptCard = cardRepository.GetCardByUuid(tradeAccept?.UUID);
 
 		if (acceptCard == null)

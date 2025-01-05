@@ -20,7 +20,8 @@ public class ElementEffectivenessRule : IBattleRule
 		{
 			card1AgainstCard2Multiplier = ElementEffectiveness.GetEffectivenessMultiplier(card1.Element, card2.Element);
 			// we use else if here so the multiplier is not applied in both directions if both cards are spells
-		}  else if (card2.Type == CardType.SPELL)
+		}
+		else if (card2.Type == CardType.SPELL)
 		{
 			card2AgainstCard1Multiplier = ElementEffectiveness.GetEffectivenessMultiplier(card2.Element, card1.Element);
 		}

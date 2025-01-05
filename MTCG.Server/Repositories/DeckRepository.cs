@@ -1,6 +1,6 @@
-﻿using System.Data;
-using MTCG.Server.Repositories.Interfaces;
+﻿using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
+using System.Data;
 
 namespace MTCG.Server.Repositories;
 

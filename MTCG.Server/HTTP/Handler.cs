@@ -1,10 +1,7 @@
-﻿using System.IO;
-using System.Net;
-using System.Net.Http.Headers;
+﻿using MTCG.Server.Models;
+using MTCG.Server.Util;
 using System.Net.Sockets;
 using System.Text;
-using MTCG.Server.Models;
-using MTCG.Server.Util;
 
 namespace MTCG.Server.HTTP;
 
@@ -59,7 +56,8 @@ public class Handler : IHandler
 				var splitLines = requestLines[0].Split(" ");
 				Method = splitLines[0];
 				FormatPath(splitLines[1]);
-			} else if (inlineHeaders)
+			}
+			else if (inlineHeaders)
 			{
 				if (string.IsNullOrWhiteSpace(requestLines[i]))
 				{

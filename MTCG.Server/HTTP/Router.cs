@@ -1,13 +1,5 @@
-﻿using System.Net.Sockets;
-using System.Reflection.Metadata;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using MTCG.Server.Models;
-using MTCG.Server.Services;
-using MTCG.Server.Services.Interfaces;
+﻿using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
-using MTCG.Server.Util.Enums;
 
 namespace MTCG.Server.HTTP;
 
@@ -39,7 +31,7 @@ public class Router
 		switch (handler.Method)
 		{
 			case "GET":
-				switch(handler.Path)
+				switch (handler.Path)
 				{
 					case "/":
 						_logger.Debug("Routing GET /");
