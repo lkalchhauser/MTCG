@@ -14,6 +14,7 @@ public static class BattleRules
 		new KnightDrownsByWaterSpellRule(),
 		new FireElvesCanEvadeDragonRule(),
 		new SlimeInvincibleAgainstOniRule(),
+		new DemonManipulatesHumanRule(),
 		new ElementEffectivenessRule()
 	];
 

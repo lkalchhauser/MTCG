@@ -204,7 +204,7 @@ public class BattleService(
 		return deck[randomIndex];
 	}
 
-	private (Card? Winner, string Log) FightRound(Card card1, Card card2)
+	public (Card? Winner, string Log) FightRound(Card card1, Card card2)
 	{
 		if (BattleRules.Apply(card1, card2, out SpecialRuleResult winner))
 		{
