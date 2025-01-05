@@ -2,7 +2,6 @@
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Services;
-using MTCG.Server.Util;
 using NSubstitute;
 using NUnit.Framework;
 using MTCG.Server.HTTP;

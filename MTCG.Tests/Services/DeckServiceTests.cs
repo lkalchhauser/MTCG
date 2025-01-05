@@ -7,7 +7,6 @@ using MTCG.Server.Util.Enums;
 using NSubstitute;
 using NUnit.Framework;
 using MTCG.Server.HTTP;
-using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Tests.Services;

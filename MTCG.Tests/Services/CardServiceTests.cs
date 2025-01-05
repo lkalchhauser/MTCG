@@ -24,7 +24,7 @@ public class CardServiceTests
 		_cardService = new CardService(_cardRepository, _packageRepository);
 	}
 
-	private Package CreatePackage(string name = "TestPackage", List<Card> cards = null)
+	private Package CreatePackage(string name = "TestPackage", List<Card>? cards = null)
 	{
 		return new Package
 		{

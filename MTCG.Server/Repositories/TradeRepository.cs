@@ -1,6 +1,7 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
+using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using System.Data;

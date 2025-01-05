@@ -1,5 +1,4 @@
 ﻿using MTCG.Server.Services.Interfaces;
-using MTCG.Server.Util;
 
 namespace MTCG.Server.HTTP;
 

@@ -5,7 +5,6 @@ using MTCG.Server.Services.Interfaces;
 using MTCG.Server.Services;
 using NSubstitute;
 using NUnit.Framework;
-using MTCG.Server.Util;
 using MTCG.Server.Models;
 using MTCG.Server.Util.Enums;
 

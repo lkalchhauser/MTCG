@@ -4,7 +4,6 @@ using MTCG.Server.Models;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services;
 using MTCG.Server.Services.Interfaces;
-using MTCG.Server.Util;
 using MTCG.Server.Util.Enums;
 using MTCG.Server.Util.HelperClasses;
 using NSubstitute;

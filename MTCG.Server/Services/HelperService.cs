@@ -1,9 +1,10 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 
-namespace MTCG.Server.Util;
+namespace MTCG.Server.Services;
 
 using BCrypt.Net;
+using MTCG.Server.Services.Interfaces;
 
 public class HelperService : IHelperService
 {

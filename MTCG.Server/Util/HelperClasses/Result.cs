@@ -1,4 +1,6 @@
-﻿namespace MTCG.Server.Util.HelperClasses;
+﻿using MTCG.Server.Services;
+
+namespace MTCG.Server.Util.HelperClasses;
 
 public class Result
 {

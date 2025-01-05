@@ -1,7 +1,7 @@
 ﻿using MTCG.Server.HTTP;
 using MTCG.Server.Models;
 
-namespace MTCG.Server.Util;
+namespace MTCG.Server.Services.Interfaces;
 
 public interface IHelperService
 {
