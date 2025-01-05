@@ -8,14 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Cards\**" />
+    <EmbeddedResource Remove="Models\Cards\**" />
+    <None Remove="Models\Cards\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="Npgsql" Version="8.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Cards\" />
   </ItemGroup>
 
   <ItemGroup>

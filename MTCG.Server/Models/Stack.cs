@@ -2,7 +2,7 @@
 
 public class Stack
 {
-	private User _user;
+	public UserCredentials User;
 
-	private List<Card> _cards;
+	public List<Card> Cards;
 }

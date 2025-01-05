@@ -30,7 +30,7 @@ public class Handler : IHandler
 		_helperService = helperService;
 	}
 
-	public async void Handle(TcpClient client)
+	public void Handle(TcpClient client)
 	{
 		_logger.Debug("Handling request");
 		Client = client;
@@ -39,7 +39,7 @@ public class Handler : IHandler
 		var stream = client.GetStream();
 		while (stream.DataAvailable || data == "")
 		{
-			var n = await stream.ReadAsync(buffer, 0, buffer.Length);
+			var n = stream.Read(buffer, 0, buffer.Length);
 			data += Encoding.UTF8.GetString(buffer, 0, n);
 		}
 

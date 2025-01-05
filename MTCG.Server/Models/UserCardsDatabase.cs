@@ -3,7 +3,7 @@
 namespace MTCG.Server.Models;
 
 // TODO: currently this is very similar to Cards, maybe abstract class?
-public class UserCards
+public class UserCardsDatabase
 {
 	public int Id { get; set; }
 	public string UUID { get; set; }

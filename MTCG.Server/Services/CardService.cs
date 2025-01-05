@@ -161,7 +161,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		{
 			return new Result(true, "No cards found for user!", statusCode: 204);
 		}
-		List<UserCards> cards = [];
+		List<UserCardsDatabase> cards = [];
 		foreach (var userCardRelation in userCardRelations)
 		{
 			var card = cardRepository.GetCardById(userCardRelation.CardId);
@@ -169,7 +169,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 			{
 				return new Result(false, "Error while getting the cards", statusCode: 500);
 			}
-			cards.Add(new UserCards()
+			cards.Add(new UserCardsDatabase()
 			{
 				Id = card.Id,
 				UUID = card.UUID,
