@@ -35,7 +35,7 @@ public class BattleService(
 
 		if (deserializedDeck.Cards != null && deserializedDeck.Cards.Count != 4)
 		{
-			return new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN);
+			return new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN, 400);
 		}
 
 		var tcs = new TaskCompletionSource<Result>();
@@ -60,18 +60,17 @@ public class BattleService(
 		}
 		else
 		{
-			// Timeout occurred, clean up the queue
+			// Clean up the queue after timeout
 			if (_waitingPlayers.TryDequeue(out var remainingPlayer) && remainingPlayer == (handler, tcs))
 			{
-				var timeoutResult = new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN);
+				var timeoutResult = new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN, 408);
 				tcs.SetResult(timeoutResult);
 			}
 
-			return new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN);
+			return new Result(false, "Timeout: No opponent found.", HelperService.TEXT_PLAIN, 408);
 		}
 	}
 
-	// TODO: when setting the deck after win/lose, add the new cards to user stack and not deck
 	private void DoBattle((IHandler, TaskCompletionSource<Result>) player1, (IHandler, TaskCompletionSource<Result>) player2, IDeckService deckService)
 	{
 		// TODO: maybe lock decks so it cannot be edited?
@@ -85,8 +84,9 @@ public class BattleService(
 
 		if (player1DeckCards is not { Count: 4 } || player2DeckCards is not { Count: 4 })
 		{
-			player1.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN));
-			player2.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN));
+			// theoretically this should be unreachable since we check the deck before pairing
+			player1.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN, 400));
+			player2.Item2.SetResult(new Result(false, "Deck must contain exactly 4 cards!", HelperService.TEXT_PLAIN, 400));
 			return;
 		}
 
@@ -195,7 +195,7 @@ public class BattleService(
 			logTable += $"\nYou {result.Result}!";
 		}
 				
-		return new Result(true, logTable, HelperService.TEXT_PLAIN);
+		return new Result(true, logTable, HelperService.TEXT_PLAIN, 200);
 	}
 
 	private static Card DrawRandomCardFromDeck(List<Card> deck)

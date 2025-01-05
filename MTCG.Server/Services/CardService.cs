@@ -21,7 +21,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
 		{
 			_logger.Debug("Register User - No valid payload data found");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 
 
@@ -35,7 +35,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		{
 			packageByName.AvailableAmount++;
 			packageRepository.UpdatePackage(packageByName);
-			return new Result(true, "Package with this name already exists, increased available amount!");
+			return new Result(true, "Package with this name already exists, increased available amount!", statusCode: 200);
 		}
 
 		List<int> cardIds = []; // should always be 5 long
@@ -50,7 +50,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 			}
 
 			_logger.Debug($"Failed to add card \"{packageCard.Name}\" to database");
-			return new Result(false, "Failed to add card to database!");
+			return new Result(false, "Failed to add card to database!", statusCode: 400);
 		}
 
 		packageRepository.AddPackage(package);
@@ -60,10 +60,10 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 			if (packageRepository.AddPackageCardRelation(package.Id, cardId)) continue;
 
 			_logger.Debug($"Failed to add card \"{cardId}\" to package \"{package.Id}\"");
-			return new Result(false, "Failed to add card to package");
+			return new Result(false, "Failed to add card to package", statusCode: 400);
 		}
 
-		return new Result(true, "Package successfully added!");
+		return new Result(true, "Package successfully added!", statusCode: 201);
 	}
 
 	public int AddCardIfNotExists(Card card)
@@ -161,7 +161,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 		var userCardRelations = cardRepository.GetAllCardRelationsForUserId(handler.AuthorizedUser.Id);
 		if (userCardRelations.Count == 0)
 		{
-			return new Result(true, "No cards found for user!");
+			return new Result(true, "No cards found for user!", statusCode: 204);
 		}
 		List<UserCards> cards = [];
 		foreach (var userCardRelation in userCardRelations)
@@ -169,7 +169,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 			var card = cardRepository.GetCardById(userCardRelation.CardId);
 			if (card == null)
 			{
-				return new Result(false, "Error while getting the cards");
+				return new Result(false, "Error while getting the cards", statusCode: 500);
 			}
 			cards.Add(new UserCards()
 			{
@@ -187,7 +187,7 @@ public class CardService(ICardRepository cardRepository, IPackageRepository pack
 			});
 		}
 
-		return new Result(true, JsonSerializer.Serialize(cards), HelperService.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(cards), HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	public bool IsCardAvailableForUser (int cardId, int userId)

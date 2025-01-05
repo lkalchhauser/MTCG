@@ -20,7 +20,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
 		{
 			_logger.Debug("Register User - No valid payload data found");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 
 		// TODO: what if its not valid? -> catch exception?
@@ -29,7 +29,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (getUserFromDb != null)
 		{
 			_logger.Debug("Register User - User already exists");
-			return new Result(false, "User already exists!");
+			return new Result(false, "User already exists!", statusCode: 409);
 		}
 		
 		var hashedPassword = helperService.HashPassword(credentials.Password);
@@ -52,14 +52,14 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 				Wins = 0
 			});
 
-			if (addUserStatsSuccessful) return new Result(true, "Successfully registered!");
+			if (addUserStatsSuccessful) return new Result(true, "Successfully registered!", statusCode: 201);
 
 			_logger.Debug("Register User - Failed to add default user stats");
-			return new Result(false, "Failed to add default user stats");
+			return new Result(false, "Failed to add default user stats", statusCode: 400);
 
 		}
 		_logger.Debug("Register User - Registration failed");
-		return new Result(false, "Registration failed!");
+		return new Result(false, "Registration failed!", statusCode: 400);
 	}
 
 	public Result LoginUser(IHandler handler)
@@ -68,7 +68,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
 		{
 			_logger.Debug("Login User - No valid payload data found");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 
 		var credentials = JsonSerializer.Deserialize<UserCredentials>(handler.Payload);
@@ -77,13 +77,13 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (userFromDb == null)
 		{
 			_logger.Debug("Login User - Login failed - User does not exist");
-			return new Result(false, "Login failed - User does not exist");
+			return new Result(false, "Login failed - User does not exist", statusCode: 404);
 		}
 
 		if (!helperService.VerifyPassword(credentials.Password, userFromDb.Password))
 		{
 			_logger.Debug("Password invalid! - Invalid Password");
-			return new Result(false, "Login failed - Login Data not correct");
+			return new Result(false, "Login failed - Login Data not correct", statusCode: 401);
 		}
 
 		_logger.Debug("Password valid! Generating token...");
@@ -94,15 +94,14 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (!userUpdateSuccessful)
 		{
 			_logger.Debug("Login User - Failed to update user");
-			// TODO: maybe add response code to Result - should be internal server error here
-			return new Result(true, "Login failed - internal error");
+			return new Result(true, "Login failed - internal error", statusCode: 400);
 		}
 
 		var temp = new { token = userFromDb.Token };
 		var tokenStringified = JsonSerializer.Serialize(temp);
 
 		_logger.Debug("Login User - Successfully logged in user");
-		return new Result(true, tokenStringified, HelperService.APPL_JSON);
+		return new Result(true, tokenStringified, HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	public UserCredentials? GetAuthorizedUserWithToken(string token)
@@ -116,10 +115,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (userInfo == null)
 		{
 			_logger.Debug("Failed to get user information (null return from db)");
-			return new Result(false, "Failed to get user information - no data found");
+			return new Result(false, "Failed to get user information - no data found", statusCode: 404);
 		}
 		_logger.Debug($"Successfully got user information: {JsonSerializer.Serialize(userInfo)}");
-		return new Result(true, JsonSerializer.Serialize(userInfo), HelperService.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(userInfo), HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	public bool IsUserAuthorized(IHandler handler)
@@ -137,7 +136,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 	{
 		if (handler.Payload == null)
 		{
-			return new Result(false, "No payload data found");
+			return new Result(false, "No payload data found", statusCode: 400);
 		}
 
 		var newUserInfo = JsonSerializer.Deserialize<UserInfo>(handler.Payload);
@@ -147,11 +146,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (getExistingUserInfo == null)
 		{
 			var addUserInfoSuccessful = userRepository.AddUserInfo(newUserInfo);
-			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
+			return addUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON, statusCode: 201) : new Result(false, "Error while adding info to database", statusCode: 400);
 		}
 		
 		var updateUserInfoSuccessful = userRepository.UpdateUserInfo(newUserInfo);
-		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON) : new Result(false, "Error while adding info to database");
+		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON, statusCode: 200) : new Result(false, "Error while adding info to database", statusCode: 400);
 	}
 
 	public Result DeleteUserInfo(IHandler handler)
@@ -159,16 +158,16 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		var existingUserInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
 		if (existingUserInfo == null)
 		{
-			return new Result(false, "No user info found to delete");
+			return new Result(false, "No user info found to delete", statusCode: 404);
 		}
 		var userInfoDeleted = userRepository.RemoveUserInfoByUserId(handler.AuthorizedUser.Id);
-		return userInfoDeleted ? new Result(true, "User info successfully deleted") : new Result(false, "Error while deleting user info");
+		return userInfoDeleted ? new Result(true, "User info successfully deleted", statusCode: 200) : new Result(false, "Error while deleting user info", statusCode: 500);
 	}
 
 	public Result GetUserStats(IHandler handler)
 	{
 		var userStats = userRepository.GetUserStats(handler);
-		return userStats == null ? new Result(false, "No user stats found") : new Result(true, JsonSerializer.Serialize(userStats), HelperService.APPL_JSON);
+		return userStats == null ? new Result(false, "No user stats found", statusCode: 404) : new Result(true, JsonSerializer.Serialize(userStats), HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	public Result UpdateUserStats(IHandler handler, UserStats userStats)
@@ -182,7 +181,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		var allStats = userRepository.GetAllStats();
 		if (allStats.Count == 0)
 		{
-			return new Result(true, "No stats found");
+			return new Result(true, "No stats found", statusCode: 404);
 		}
 
 		List<ScoreboardUser> scoreboard = [];
@@ -192,7 +191,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 			var user = userRepository.GetUserById(stat.Id);
 			if (user == null)
 			{
-				return new Result(false, "Error while getting user data");
+				return new Result(false, "Error while getting user data", statusCode: 500);
 			}
 			scoreboard.Add(new ScoreboardUser()
 			{
@@ -211,10 +210,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (handler.HasPlainFormat())
 		{
 			var finalText = helperService.GenerateScoreboardTable(sortedScoreboardUsers);
-			return new Result(true, finalText, HelperService.TEXT_PLAIN);
+			return new Result(true, finalText, HelperService.TEXT_PLAIN, 200);
 		}
 
-		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), HelperService.APPL_JSON);
+		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), HelperService.APPL_JSON, 200);
 	}
 
 	public Result UpdatePassword(IHandler handler)
@@ -223,7 +222,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		if (handler.GetContentType() != "application/json" || handler.Payload == null)
 		{
 			_logger.Debug("Register User - No valid payload data found");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 
 		// TODO: what if its not valid? -> catch exception?
@@ -232,6 +231,6 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		getUserFromDb.Password = helperService.HashPassword(credentials.Password);
 		getUserFromDb.Token = "";
 		userRepository.UpdateUser(getUserFromDb);
-		return new Result(true, "Password successfully updated");
+		return new Result(true, "Password successfully updated", statusCode: 200);
 	}
 }

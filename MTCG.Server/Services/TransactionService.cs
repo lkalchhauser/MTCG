@@ -1,21 +1,21 @@
-﻿using MTCG.Server.HTTP;
+﻿using System.Text.Json;
+using MTCG.Server.HTTP;
 using MTCG.Server.Models;
-using MTCG.Server.Repositories;
 using MTCG.Server.Repositories.Interfaces;
 using MTCG.Server.Services.Interfaces;
+using MTCG.Server.Util;
 using MTCG.Server.Util.HelperClasses;
 
 namespace MTCG.Server.Services;
 
 public class TransactionService(
 	IPackageRepository packageRepository,
-	ICardRepository cardRep,
+	ICardRepository cardRepository,
 	IUserRepository userRepository,
 	ICardService cardService)
 	: ITransactionService
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-	private ICardRepository _cardRep = cardRep;
 
 	public Result GetRandomPackageForUser(IHandler handler)
 	{
@@ -23,14 +23,14 @@ public class TransactionService(
 		if (pckgId == 0)
 		{
 			_logger.Debug("GetRandomPackageForUser - No packages found");
-			return new Result(false, "No packages found!");
+			return new Result(false, "No packages found!", statusCode: 404);
 		}
 		var package = packageRepository.GetPackageWithoutCardsById(pckgId);
 
 		if (handler.AuthorizedUser.Coins < package.Cost)
 		{
 			_logger.Debug("GetRandomPackageForUser - Not enough coins");
-			return new Result(false, "Not enough coins!");
+			return new Result(false, "Not enough coins!", statusCode: 403);
 		}
 
 		var packageCardIds = packageRepository.GetPackageCardIds(pckgId);
@@ -44,11 +44,11 @@ public class TransactionService(
 		userRepository.UpdateUser(handler.AuthorizedUser);
 		RemoveOnePackageById(package.Id);
 
-		//List<Card> cards = [];
+		List<Card> cards = [];
 
-		//cards.AddRange(packageCardIds.Select(cardId => _cardRep.GetCardById(cardId)).OfType<Card>());
+		cards.AddRange(packageCardIds.Select(cardRepository.GetCardById).OfType<Card>());
 
-		return new Result(true, "");
+		return new Result(true, JsonSerializer.Serialize(cards), contentType: HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	public void RemoveOnePackageById(int packageId)

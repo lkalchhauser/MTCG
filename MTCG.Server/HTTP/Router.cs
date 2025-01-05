@@ -54,7 +54,7 @@ public class Router
 						}
 
 						var getUserInfoResult = _userService.GetUserInformationForUser(handler);
-						handler.Reply(getUserInfoResult.Success ? 200 : 400, getUserInfoResult.Message, getUserInfoResult.ContentType);
+						handler.Reply(getUserInfoResult.StatusCode, getUserInfoResult.Message, getUserInfoResult.ContentType);
 						break;
 					case "/cards":
 						_logger.Debug("Routing GET /cards");
@@ -64,7 +64,7 @@ public class Router
 							break;
 						}
 						var getCardsResult = _cardService.ShowAllCardsForUser(handler);
-						handler.Reply(getCardsResult.Success ? 200 : 400, getCardsResult.Message, getCardsResult.ContentType);
+						handler.Reply(getCardsResult.StatusCode, getCardsResult.Message, getCardsResult.ContentType);
 						// return all cards
 						break;
 					case { } s when s.StartsWith("/deck"):
@@ -75,7 +75,7 @@ public class Router
 							break;
 						}
 						var userDeckResult = _deckService.GetDeckForCurrentUser(handler);
-						handler.Reply(userDeckResult.Success ? 200 : 400, userDeckResult.Message, userDeckResult.ContentType);
+						handler.Reply(userDeckResult.StatusCode, userDeckResult.Message, userDeckResult.ContentType);
 						break;
 					case "/stats":
 						_logger.Debug("Routing GET /stats");
@@ -85,12 +85,12 @@ public class Router
 							break;
 						}
 						var userStatsResult = _userService.GetUserStats(handler);
-						handler.Reply(userStatsResult.Success ? 200 : 400, userStatsResult.Message, userStatsResult.ContentType);
+						handler.Reply(userStatsResult.StatusCode, userStatsResult.Message, userStatsResult.ContentType);
 						break;
 					case "/scoreboard":
 						_logger.Debug("Routing GET /scoreboard");
 						var getScoreboardResult = _userService.GetScoreboard(handler);
-						handler.Reply(getScoreboardResult.Success ? 200 : 400, getScoreboardResult.Message, getScoreboardResult.ContentType);
+						handler.Reply(getScoreboardResult.StatusCode, getScoreboardResult.Message, getScoreboardResult.ContentType);
 						break;
 					case "/tradings":
 						_logger.Debug("Routing GET /tradings");
@@ -101,13 +101,12 @@ public class Router
 						}
 
 						var getAllTradesResult = _tradingService.GetCurrentlyActiveTrades(handler);
-						handler.Reply(getAllTradesResult.Success ? 200 : 400, getAllTradesResult.Message, getAllTradesResult.ContentType);
+						handler.Reply(getAllTradesResult.StatusCode, getAllTradesResult.Message, getAllTradesResult.ContentType);
 						break;
 					default:
 						handler.Reply(404);
 						break;
 				}
-				// tradings
 				break;
 			case "POST":
 				switch (handler.Path)
@@ -115,24 +114,24 @@ public class Router
 					case "/users":
 						_logger.Debug("Routing POST /user");
 						var userRegisterResult = _userService.RegisterUser(handler);
-						handler.Reply(userRegisterResult.Success ? 201 : 400, userRegisterResult.Message, userRegisterResult.ContentType);
+						handler.Reply(userRegisterResult.StatusCode, userRegisterResult.Message, userRegisterResult.ContentType);
 						break;
 					case "/sessions":
 						_logger.Debug("Routing POST /sessions");
 						var userLoginResult = _userService.LoginUser(handler);
-						handler.Reply(userLoginResult.Success ? 200 : 400, userLoginResult.Message, userLoginResult.ContentType);
+						handler.Reply(userLoginResult.StatusCode, userLoginResult.Message, userLoginResult.ContentType);
 						break;
 					case "/packages":
 						_logger.Debug("Routing POST /packages");
 						var authUser = _userService.GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
 						if (authUser is not { Username: "admin" })
 						{
-							handler.Reply(401);
+							handler.Reply(403);
 							return;
 						}
 						handler.AuthorizedUser = authUser;
 						var createPackageResult = _cardService.CreatePackageAndCards(handler);
-						handler.Reply(createPackageResult.Success ? 200 : 400, createPackageResult.Message, createPackageResult.ContentType);
+						handler.Reply(createPackageResult.StatusCode, createPackageResult.Message, createPackageResult.ContentType);
 						break;
 					case "/transactions/packages":
 						_logger.Debug("Routing POST /transactions/packages");
@@ -142,7 +141,7 @@ public class Router
 							break;
 						}
 						var getPackageResult = _transactionService.GetRandomPackageForUser(handler);
-						handler.Reply(getPackageResult.Success ? 200 : 400, getPackageResult.Message, getPackageResult.ContentType);
+						handler.Reply(getPackageResult.StatusCode, getPackageResult.Message, getPackageResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/battles"):
 						_logger.Debug("Routing POST /battles");
@@ -153,7 +152,7 @@ public class Router
 						}
 
 						var battleRequestResult = await _battleService.WaitForBattleAsync(handler, TimeSpan.FromMinutes(1), _deckService, _cardService);
-						handler.Reply(battleRequestResult.Success ? 200 : 408, battleRequestResult.Message, battleRequestResult.ContentType);
+						handler.Reply(battleRequestResult.StatusCode, battleRequestResult.Message, battleRequestResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/tradings/"):
 						_logger.Debug("Routing POST /tradings/");
@@ -163,7 +162,7 @@ public class Router
 							break;
 						}
 						var acceptTradingOffer = _tradingService.AcceptTradeOffer(handler);
-						handler.Reply(acceptTradingOffer.Success ? 200 : 400, acceptTradingOffer.Message, acceptTradingOffer.ContentType);
+						handler.Reply(acceptTradingOffer.StatusCode, acceptTradingOffer.Message, acceptTradingOffer.ContentType);
 						break;
 					case "/tradings":
 						_logger.Debug("Routing POST /tradings");
@@ -173,13 +172,12 @@ public class Router
 							break;
 						}
 						var createTradingOffer = _tradingService.CreateTradeOffer(handler);
-						handler.Reply(createTradingOffer.Success ? 200 : 400, createTradingOffer.Message, createTradingOffer.ContentType);
+						handler.Reply(createTradingOffer.StatusCode, createTradingOffer.Message, createTradingOffer.ContentType);
 						break;
 					default:
 						handler.Reply(404);
 						break;
 				}
-				// tradings/{tradingdealid}
 				break;
 			case "PUT":
 				switch (handler.Path)
@@ -193,7 +191,7 @@ public class Router
 						}
 
 						var setDeckResult = _deckService.SetDeckForCurrentUser(handler);
-						handler.Reply(setDeckResult.Success ? 200 : 400, setDeckResult.Message, setDeckResult.ContentType);
+						handler.Reply(setDeckResult.StatusCode, setDeckResult.Message, setDeckResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/users/password"):
 						_logger.Debug($"Routing PUT {handler.Path}");
@@ -203,7 +201,7 @@ public class Router
 							break;
 						}
 						var updatePasswordResult = _userService.UpdatePassword(handler);
-						handler.Reply(updatePasswordResult.Success ? 200 : 400, updatePasswordResult.Message, updatePasswordResult.ContentType);
+						handler.Reply(updatePasswordResult.StatusCode, updatePasswordResult.Message, updatePasswordResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/users/"):
 						_logger.Debug($"Routing PUT {handler.Path}");
@@ -214,7 +212,7 @@ public class Router
 						}
 
 						var addOrUpdateUserInfoResult = _userService.AddOrUpdateUserInfo(handler);
-						handler.Reply(addOrUpdateUserInfoResult.Success ? 200 : 400, addOrUpdateUserInfoResult.Message, addOrUpdateUserInfoResult.ContentType);
+						handler.Reply(addOrUpdateUserInfoResult.StatusCode, addOrUpdateUserInfoResult.Message, addOrUpdateUserInfoResult.ContentType);
 						break;
 				}
 				break;
@@ -229,7 +227,7 @@ public class Router
 							break;
 						}
 						var deleteUserInfoResult = _userService.DeleteUserInfo(handler);
-						handler.Reply(deleteUserInfoResult.Success ? 200 : 400, deleteUserInfoResult.Message, deleteUserInfoResult.ContentType);
+						handler.Reply(deleteUserInfoResult.StatusCode, deleteUserInfoResult.Message, deleteUserInfoResult.ContentType);
 						break;
 					case { } s when s.StartsWith("/tradings/"):
 						_logger.Debug("Routing DELETE /tradings/");
@@ -239,10 +237,9 @@ public class Router
 							break;
 						}
 						var deleteTradeResult = _tradingService.DeleteTrade(handler);
-						handler.Reply(deleteTradeResult.Success ? 200 : 400, deleteTradeResult.Message, deleteTradeResult.ContentType);
+						handler.Reply(deleteTradeResult.StatusCode, deleteTradeResult.Message, deleteTradeResult.ContentType);
 						break;
 				}
-				// tradings/{tradingdealid}
 				break;
 		}
 	}

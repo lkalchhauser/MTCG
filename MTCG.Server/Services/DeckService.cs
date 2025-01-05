@@ -20,6 +20,11 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		_logger.Debug($"Getting current deck for user {handler.AuthorizedUser.Username}");
 		var deckId = deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
 		var cardIds = deckRepository.GetAllCardIdsFromDeckId(deckId);
+		if (cardIds.Count == 0)
+		{
+			_logger.Debug("No cards found in deck");
+			return new Result(true, "No cards found in deck!", statusCode: 204);
+		}
 		var deck = new Deck()
 		{
 			Cards = []
@@ -41,9 +46,9 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		if (handler.HasPlainFormat() && !forceJsonFormat)
 		{
 			var finalText = deck.Cards.Aggregate("", (current, deckCard) => current + (deckCard + "\n"));
-			return new Result(true, finalText, HelperService.TEXT_PLAIN);
+			return new Result(true, finalText, HelperService.TEXT_PLAIN, statusCode: 200);
 		}
-		return new Result(true, serializedDeckCards, HelperService.APPL_JSON);
+		return new Result(true, serializedDeckCards, HelperService.APPL_JSON, statusCode: 200);
 	}
 
 	// all of this currently only works if there is only one of each card per package
@@ -53,14 +58,14 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
 		{
 			_logger.Debug("SetDeckForCurrentUser - No valid payload data found");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 
 		var cardUuids = JsonSerializer.Deserialize<List<string>>(handler.Payload);
 		if (cardUuids.Count != 4)
 		{
 			_logger.Debug("SetDeckForCurrentUser - No valid payload data found (not enough or too many uuids)");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 400);
 		}
 		List<Card> cards = [];
 
@@ -70,7 +75,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 			if (card == null)
 			{
 				_logger.Debug($"No card found for card uuid \"{cardUuid}\"");
-				return new Result(false, "Badly formatted data sent!");
+				return new Result(false, "Badly formatted data sent!", statusCode: 403);
 			}
 			cards.Add(card);
 		}
@@ -83,7 +88,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		foreach (var card in cards.Where(card => !IsCardAvailableForUser(card, handler.AuthorizedUser, currentDeckCards)))
 		{
 			_logger.Debug($"Card {card.Name} not available for user {handler.AuthorizedUser.Username}");
-			return new Result(false, "Badly formatted data sent!");
+			return new Result(false, "Badly formatted data sent!", statusCode: 403);
 		}
 
 		var deckId = deckRepository.GetDeckIdFromUserId(handler.AuthorizedUser.Id);
@@ -102,7 +107,7 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 			deckRepository.AddCardToDeck(createdDeckId, card.Id);
 		}
 
-		return new Result(true, "");
+		return new Result(true, "", statusCode: 200);
 	}
 
 	public void RemoveAndUnlockDeck(int deckId, UserCredentials user, List<Card> currentDeck)
