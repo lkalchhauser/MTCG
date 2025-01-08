@@ -1,0 +1,233 @@
+@startuml
+
+
+package "MTCG.Server.Services" #GreenYellow/LightGoldenRodYellow {
+
+    interface "IBattleService" as IBattleService
+
+    class BattleService extends IBattleService{
+        .. Fields ..
+        -ConcurrentQueue<(IHandler handler, TaskCompletionSource<Result> tcs)> _waitingPlayers
+        .. Methods ..
+        +Task<Result> WaitForBattleAsync()
+        -void DoBattle()
+        -UserStats GetUpdatedUserStatsObject()
+        -Result GetResult()
+        -Card DrawRandomCardFromDeck()
+        +(Card? Winner, string Log) FightRound()
+    }
+
+    interface "ICardService" as ICardService
+    class CardService extends ICardService{
+        .. Methods ..
+        +Result CreatePackageAndCards()
+        +int AddCardIfNotExists()
+        +bool AddCardsToUserStack()
+        +bool AddCardToUserStack()
+        +bool RemoveCardsFromUserStack()
+        +bool RemoveCardFromUserStack()
+        +bool LockCardInUserStack()
+        +bool UnlockCardInUserStack()
+        +Result ShowAllCardsForUser()
+        +bool IsCardAvailableForUser()
+    }
+
+    interface "IDeckService" as IDeckService
+    class DeckService extends IDeckService{
+        .. Methods ..
+        +Result GetDeckForCurrentUser()
+        +Result SetDeckForCurrentUser()
+        +void RemoveAndUnlockDeck()
+        +void DeleteDeckAndCardsFromUser()
+        +bool IsCardAvailableForUser()
+    }
+
+
+
+    interface "ITradeService" as ITradeService
+    class TradeService extends ITradeService{
+        .. Methods ..
+        +Result CreateTradeOffer()
+        +Result GetCurrentlyActiveTrades()
+        +Result DeleteTrade()
+        +Result AcceptTradeOffer()
+        -Result IsCardValidToTrade()
+        -string GenerateTradeTable()
+        -string? GetCardNameFromId()
+        -string GetUserNameFromId()
+    }
+
+    interface "ITransactionService" as ITransactionService
+    class TransactionService extends ITransactionService{
+        .. Methods ..
+        +Result GetRandomPackageForUser()
+        +void RemoveOnePackageById()
+    }
+
+    interface "IUserService" as IUserService
+    class UserService extends IUserService{
+        .. Methods ..
+        +Result RegisterUser()
+        +Result LoginUser()
+        +UserCredentials? GetAuthorizedUserWithToken()
+        +Result GetUserInformationForUser()
+        +bool IsUserAuthorized()
+        +Result AddOrUpdateUserInfo()
+        +Result DeleteUserInfo()
+        +Result GetUserStats()
+        +Result UpdateUserStats()
+        +Result GetScoreboard()
+        +Result UpdatePassword()
+    }
+
+    interface "IHelperService" as IHelperService
+    class HelperService extends IHelperService{
+        .. Fields ..
+        +Dictionary<int, string> HTTP_CODES
+        +string
+        TEXT_PLAIN
+        .. Methods ..
+        +string HashPassword()
+        +bool VerifyPassword()
+        +string? GenerateToken()
+        +Dictionary<int, string> GetHttpCodes()
+        +bool IsRequestedUserAuthorizedUser()
+        +string ExtractUsernameFromPath()
+        +string GenerateScoreboardTable()
+        +TEnum? ParseEnumOrNull()
+    }
+}
+
+
+
+package "MTCG.Server.Repositories" #GreenYellow/LightGoldenRodYellow {
+    interface "ICardRepository" as ICardRepository
+    class CardRepository extends ICardRepository{
+        .. Methods ..
+        +int AddCard()
+        +Card? GetCardById()
+        +Card? GetCardByUuid()
+        +bool AddNewCardToUserStack()
+        +UserCardRelation? GetUserCardRelation()
+        +List<UserCardRelation> GetAllCardRelationsForUserId()
+        +bool UpdateUserCardRelation()
+        +bool RemoveCardUserStack()
+    }
+
+    interface "IDeckRepository" as IDeckRepository
+    class DeckRepository extends IDeckRepository{
+        .. Methods ..
+        +int GetDeckIdFromUserId()
+        +List<int> GetAllCardIdsFromDeckId()
+        +bool DeleteDeckById()
+        +int AddNewDeckToUserId()
+        +bool AddCardToDeck()
+    }
+
+    interface "IPackageRepository" as IPackageRepository
+    class PackageRepository extends IPackageRepository{
+        .. Methods ..
+        +bool AddPackage()
+        +Package? GetPackageIdByName()
+        +bool UpdatePackage()
+        +bool AddPackageCardRelation()
+        +int GetRandomPackageId()
+        +Package GetPackageWithoutCardsById()
+        +List<int> GetPackageCardIds()
+        +bool DeletePackage()
+    }
+
+    interface "ITradeRepository" as ITradeRepository
+    class TradeRepository extends ITradeRepository{
+        .. Methods ..
+        +bool AddTradeOffer()
+        +List<TradeOffer>? GetAllTradesWithStatus()
+        +TradeOffer? GetTradeById()
+        +bool UpdateTrade()
+        +bool AddTradeAcceptEntry()
+    }
+
+    interface "IUserRepository" as IUserRepository
+    class UserRepository extends IUserRepository{
+        .. Methods ..
+        +UserCredentials? GetUserByUsername()
+        +UserCredentials? GetUserById()
+        +UserCredentials? GetUserByToken()
+        +int AddUser()
+        +bool UpdateUser()
+        +bool RemoveUser()
+        +UserInfo? GetUserInfoByUser()
+        +bool AddUserInfo()
+        +bool UpdateUserInfo()
+        +bool RemoveUserInfoByUserId()
+        +UserStats? GetUserStats()
+        +bool AddUserStats()
+        +bool UpdateUserStats()
+        +List<UserStats> GetAllStats()
+    }
+}
+
+package "MTCG.Server.HTTP" #GreenYellow/LightGoldenRodYellow{
+    class Server {
+        .. Constructors ..
+        +Server()
+        .. Fields ..
+        -TcpListener _tcpListener
+        -bool _running
+        -Uri _uri
+        .. Methods ..
+        +void Start()
+        +void ConfigureServices()
+    }
+
+    class Handler extends IHandler{
+        .. Constructors ..
+        +Handler()
+        .. Fields ..
+        +IHelperService _helperService
+        .. Properties ..
+        + TcpClient Client
+        + string PlainMessage
+        + string Method
+        + string Path
+        + List<QueryParam> QueryParams
+        + HttpHeader[] Headers
+        + string? Payload
+        + int StatusCode
+        + UserCredentials AuthorizedUser
+        .. Methods ..
+        +void Handle()
+        +void FormatQueryParams()
+        +void Reply()
+        +string GetContentType()
+        +string GetAuthorizationToken()
+        +bool HasPlainFormat()
+    }
+
+    class Router {
+        .. Constructors ..
+        +Router()
+        .. Fields ..
+        -IUserService _userService
+        -ICardService _cardService
+        -ITransactionService _transactionService
+        -IDeckService _deckService
+        -IBattleService _battleService
+        -ITradeService _tradingService
+        -IHelperService _helperService
+        .. Methods ..
+        +void HandleIncoming()
+    }
+}
+
+MTCG.Server.HTTP.Server --> Handler : 1: calls on new request
+MTCG.Server.HTTP.Server --> Router : 2: calls with handler
+Router -down---> "MTCG.Server.Services" : 3. calls appropriate service
+MTCG.Server.Services -down---> "MTCG.Server.Repositories" : 4. calls needed repositories
+MTCG.Server.Repositories -up---> MTCG.Server.Services : 5. returns data to service
+MTCG.Server.Services -up---> Router : 6. returns processed data to router
+Router -up---> Handler : 7. replies to client
+
+' UserService -----> UserRepository
+
+@enduml
