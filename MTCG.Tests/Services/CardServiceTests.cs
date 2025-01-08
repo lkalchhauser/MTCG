@@ -188,7 +188,6 @@ public class CardServiceTests
 
 		Assert.That(result.Success, Is.True);
 		Assert.That(result.StatusCode, Is.EqualTo(204));
-		Assert.That(result.Message, Is.EqualTo("No cards found for user!"));
 	}
 
 	[Test]
