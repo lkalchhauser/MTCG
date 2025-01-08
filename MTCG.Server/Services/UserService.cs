@@ -7,11 +7,19 @@ using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
+/**
+ * Service for handling user related operations
+ */
 public class UserService(IUserRepository userRepository, IHelperService helperService)
 	: IUserService
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+	/**
+	 *	Registers a new user (if not already existing)
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object with info about the success of the operation</returns>
+	 */
 	public Result RegisterUser(IHandler handler)
 	{
 		_logger.Debug("Register User - Registering user...");
@@ -60,6 +68,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return new Result(false, "Registration failed!", statusCode: 400);
 	}
 
+	/**
+	 *	Login a user
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object with info about the success of the operation</returns>
+	 */
 	public Result LoginUser(IHandler handler)
 	{
 		_logger.Debug("Login User - Logging in user...");
@@ -102,11 +115,21 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return new Result(true, tokenStringified, HelperService.APPL_JSON, statusCode: 200);
 	}
 
+	/**
+	 *	Logout a user
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object with info about the success of the operation</returns>
+	 */
 	public UserCredentials? GetAuthorizedUserWithToken(string token)
 	{
 		return userRepository.GetUserByToken(token);
 	}
 
+	/**
+	 *	Logout a user
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object with info about the success of the operation</returns>
+	 */
 	public Result GetUserInformationForUser(IHandler handler)
 	{
 		var userInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
@@ -119,6 +142,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return new Result(true, JsonSerializer.Serialize(userInfo), HelperService.APPL_JSON, statusCode: 200);
 	}
 
+	/**
+	 *	Checks if the user is authorized (by comparing token with the one saved in db)
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>true if user is authorized, false if not</returns>
+	 */
 	public bool IsUserAuthorized(IHandler handler)
 	{
 		var authUser = GetAuthorizedUserWithToken(handler.GetAuthorizationToken());
@@ -130,6 +158,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return true;
 	}
 
+	/**
+	 *	Checks if the user is authorized (by comparing token with the one saved in db)
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object containing info about the success of the operation</returns>
+	 */
 	public Result AddOrUpdateUserInfo(IHandler handler)
 	{
 		if (handler.Payload == null)
@@ -151,6 +184,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return updateUserInfoSuccessful ? new Result(true, JsonSerializer.Serialize(newUserInfo), HelperService.APPL_JSON, statusCode: 200) : new Result(false, "Error while adding info to database", statusCode: 400);
 	}
 
+	/**
+	 *	Deletes the user info for the user
+	 *	<param name="handler">the handler containing the payload</param>
+	 *	<returns>Result object containing info about the success of the operation</returns>
+	 */
 	public Result DeleteUserInfo(IHandler handler)
 	{
 		var existingUserInfo = userRepository.GetUserInfoByUser(handler.AuthorizedUser);
@@ -162,18 +200,33 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return userInfoDeleted ? new Result(true, "User info successfully deleted", statusCode: 200) : new Result(false, "Error while deleting user info", statusCode: 500);
 	}
 
+	/**
+	 *	Gets the user stats
+	 *	<param name="handler">handler containing the authorized user</param>
+	 *	<returns>The result object containing the needed info</returns>
+	 */
 	public Result GetUserStats(IHandler handler)
 	{
 		var userStats = userRepository.GetUserStats(handler);
 		return userStats == null ? new Result(false, "No user stats found", statusCode: 404) : new Result(true, JsonSerializer.Serialize(userStats), HelperService.APPL_JSON, statusCode: 200);
 	}
 
+	/**
+	 *	Updates the user stats
+	 *	<param name="handler">handler containing the authorized user</param>
+	 *	<param name="userStats">the user stats to update</param>
+	 *	<returns>The result object containing the needed info</returns>
+	 */
 	public Result UpdateUserStats(IHandler handler, UserStats userStats)
 	{
 		var updateSuccessful = userRepository.UpdateUserStats(userStats);
 		return updateSuccessful ? new Result(true, "User stats successfully updated") : new Result(false, "Error while updating user stats");
 	}
 
+	/**
+	 *	Gets the scoreboard
+	 *	<param name="handler">handler containing the authorized user and any needed params (e.g. format plain)</param>
+	 */
 	public Result GetScoreboard(IHandler handler)
 	{
 		var allStats = userRepository.GetAllStats();
@@ -214,6 +267,11 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 		return new Result(true, JsonSerializer.Serialize(sortedScoreboardUsers), HelperService.APPL_JSON, 200);
 	}
 
+	/**
+	 *	Updates the password for the user
+	 *	<param name="handler">handler containing the authorized user</param>
+	 *	<returns>The result object containing the needed info</returns>
+	 */
 	public Result UpdatePassword(IHandler handler)
 	{
 		_logger.Debug($"Updating password for user {handler.AuthorizedUser.Username}");

@@ -8,6 +8,10 @@ public class BattleResult(Util.Enums.BattleResult result, List<BattleLogEntry> b
 	public Util.Enums.BattleResult Result { get; set; } = result;
 	public List<BattleLogEntry> BattleLog { get; set; } = battleLog;
 
+	/**
+	 *	Generates a nicely formatted table out of the battle log entries
+	 *	<returns>The formatted table string</returns>
+	 */
 	public string GenerateBattleLogTable()
 	{
 		var p1 = BattleLog.First().Player1;
@@ -38,6 +42,10 @@ public class BattleResult(Util.Enums.BattleResult result, List<BattleLogEntry> b
 		return finalTable;
 	}
 
+	/**
+	 *	Gets the winner card name from the battle log result
+	 *	<returns>The winner card name ("Draw" in case of draw)</returns>
+	 */
 	private string GetWinnerCardNameFromResult(BattleLogResult battleLogResult, Card card1, Card card2)
 	{
 		return battleLogResult switch
@@ -48,6 +56,10 @@ public class BattleResult(Util.Enums.BattleResult result, List<BattleLogEntry> b
 		};
 	}
 
+	/**
+	 *	Gets the player name from the battle log result
+	 *	<returns>The player name ("Draw" in case of draw)</returns>
+	 */
 	private string GetPlayerNameFromResult(BattleLogResult battleLogResult)
 	{
 		return battleLogResult switch

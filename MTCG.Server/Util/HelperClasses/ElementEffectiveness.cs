@@ -4,6 +4,7 @@ namespace MTCG.Server.Util.HelperClasses;
 
 public class ElementEffectiveness
 {
+	// Returns the effectiveness multiplier of the first element against the second element
 	public static float GetEffectivenessMultiplier(Element card1Element, Element card2Element)
 	{
 		return (card1Element, card2Element) switch

@@ -8,6 +8,9 @@ using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
+/**
+ * This class is responsible for handling trade related operations.
+ */
 public class TradeService(
 	ITradeRepository tradeRepository,
 	ICardRepository cardRepository,
@@ -18,6 +21,11 @@ public class TradeService(
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+	/**
+	 * Creates a new trade offer.
+	 *	<param name="handler">The handler containing the payload</param>
+	 *	<returns>A result object containing information about the success of the operation</returns>
+	 */
 	public Result CreateTradeOffer(IHandler handler)
 	{
 		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
@@ -59,7 +67,11 @@ public class TradeService(
 		return new Result(true, "Trade deal successfully created!", statusCode: 201);
 	}
 
-
+	/**
+	 * Gets all currently active trade offers.
+	 *	<param name="handler">The handler containing the authorized user</param>
+	 *	<returns>A result object containing information about the success of the operation</returns>
+	 */
 	public Result GetCurrentlyActiveTrades(IHandler handler)
 	{
 		var currentTrades = tradeRepository.GetAllTradesWithStatus(TradeStatus.ACTIVE);
@@ -72,6 +84,11 @@ public class TradeService(
 		return !handler.HasPlainFormat() ? new Result(true, JsonSerializer.Serialize(currentTrades), HelperService.APPL_JSON, 200) : new Result(true, GenerateTradeTable(currentTrades), HelperService.TEXT_PLAIN, 200);
 	}
 
+	/**
+	 * Deletes a trade offer.
+	 *	<param name="handler">The handler containing the trade id</param>
+	 *	<returns>A result object containing information about the success of the operation</returns>
+	 */
 	public Result DeleteTrade(IHandler handler)
 	{
 		int.TryParse(handler.Path.Split("/").Last(), out var tradingId);
@@ -109,6 +126,11 @@ public class TradeService(
 		return new Result(true, "Trade successfully deleted!", statusCode: 200);
 	}
 
+	/**
+	 * Accepts a trade offer.
+	 *	<param name="handler">The handler containing the payload</param>
+	 *	<returns>A result object containing information about the success of the operation</returns>
+	 */
 	public Result AcceptTradeOffer(IHandler handler)
 	{
 		if (handler.GetContentType() != HelperService.APPL_JSON || handler.Payload == null)
@@ -197,6 +219,11 @@ public class TradeService(
 		return new Result(true, "Trade successfully accepted!", statusCode: 200);
 	}
 
+	/**
+	 * Shows all trades for a user.
+	 *	<param name="handler">The handler containing the user</param>
+	 *	<returns>A result object containing the trades and info about the success</returns>
+	 */
 	private Result IsCardValidToTrade(TradeOffer offer, Card acceptCard)
 	{
 		if (offer.DesiredCardType != null)
@@ -243,6 +270,11 @@ public class TradeService(
 		return new Result(true, "Trade is valid!");
 	}
 
+	/**
+	 * Shows all trades for a user.
+	 *	<param name="handler">The handler containing the user</param>
+	 *	<returns>A result object containing the trades and info about the success</returns>
+	 */
 	private string GenerateTradeTable(List<TradeOffer> tradeOffers)
 	{
 		if (tradeOffers.Count == 0)
@@ -280,12 +312,22 @@ public class TradeService(
 		return $"{headerRow}\n{separatorRow}\n{string.Join("\n", rows)}";
 	}
 
+	/**
+	 * Gets the card name from the id.
+	 *	<param name="cardId">The id of the card</param>
+	 *	<returns>The name of the card</returns>
+	 */
 	private string? GetCardNameFromId(int cardId)
 	{
 		var cardNameFromId = cardRepository.GetCardById(cardId)?.Name;
 		return cardNameFromId ?? null;
 	}
 
+	/**
+	 * Gets the username from the id.
+	 *	<param name="userId">The id of the user</param>
+	 *	<returns>The name of the user</returns>
+	 */
 	private string GetUserNameFromId(int userId)
 	{
 		var userNameFromId = userRepository.GetUserById(userId)?.Username;

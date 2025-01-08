@@ -12,7 +12,13 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-	// currently we only allow one of each card per deck and one deck per user
+	/**
+	 *	Gets the deck for the current user (based on the handler)
+	 *	This currently only works if there is only one of each card per deck and one deck per user
+	 *	<param name="handler">THe handler containing the authorized user</param>
+	 *	<param name="forceJsonFormat">if the output should be forced to a json format</param>
+	 *	<returns>The result of the operation</returns>
+	 */
 	public Result GetDeckForCurrentUser(IHandler handler, bool forceJsonFormat = false)
 	{
 		_logger.Debug($"Getting current deck for user {handler.AuthorizedUser.Username}");
@@ -49,7 +55,12 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		return new Result(true, serializedDeckCards, HelperService.APPL_JSON, statusCode: 200);
 	}
 
-	// all of this currently only works if there is only one of each card per package
+	/**
+	 *	Sets the deck for the current user
+	 *	Currently only works if there is only one of each card per deck and per package
+	 *	<param name="handler">The handler containing the authorized user</param>
+	 *	<returns>The result of the operation</returns>
+	 */
 	public Result SetDeckForCurrentUser(IHandler handler)
 	{
 		_logger.Debug($"Setting deck for user {handler.AuthorizedUser.Username}");
@@ -119,6 +130,12 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		return new Result(true, "", statusCode: 200);
 	}
 
+	/**
+	 *	Removes the deck from the user and unlocks it
+	 *	<param name="deckId">The deck id</param>
+	 *	<param name="user">The user (owner) of the deck</param>
+	 *	<param name="currentDeck">The current deck as list of cards</param>
+	 */
 	public void RemoveAndUnlockDeck(int deckId, UserCredentials user, List<Card> currentDeck)
 	{
 		foreach (var card in currentDeck)
@@ -135,6 +152,14 @@ public class DeckService(IDeckRepository deckRepository, ICardRepository cardRep
 		// TODO: this is not implemented yet
 	}
 
+	/**
+	 * Checks if a card is available for a user
+	 *	Only works if we allow one of each card per deck
+	 *	<param name="card">The given card</param>
+	 *	<param name="user">The user</param>
+	 *	<param name="currentDeck">the current deck of the user</param>
+	 *	<returns>true if the card is available, false if not</returns>
+	 */
 	public bool IsCardAvailableForUser(Card card, UserCredentials user, List<Card> currentDeck)
 	{
 		var currentAmount = 0;

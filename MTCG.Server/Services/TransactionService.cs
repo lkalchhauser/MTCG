@@ -7,6 +7,9 @@ using System.Text.Json;
 
 namespace MTCG.Server.Services;
 
+/**
+ * This class is responsible for handling transaction related operations
+ */
 public class TransactionService(
 	IPackageRepository packageRepository,
 	ICardRepository cardRepository,
@@ -16,6 +19,11 @@ public class TransactionService(
 {
 	private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+	/**
+	 * Gets a random package for the user and adds the cards to the user stack
+	 *	<param name="handler">The handler containing the authorized user</param>
+	 *	<returns>A result object containing information about the success of the operation</returns>
+	 */
 	public Result GetRandomPackageForUser(IHandler handler)
 	{
 		var pckgId = packageRepository.GetRandomPackageId();
@@ -50,6 +58,10 @@ public class TransactionService(
 		return new Result(true, JsonSerializer.Serialize(cards), contentType: HelperService.APPL_JSON, statusCode: 200);
 	}
 
+	/**
+	 * Removes one package by its id
+	 *	<param name="packageId">The id of the package</param>
+	 */
 	public void RemoveOnePackageById(int packageId)
 	{
 		var package = packageRepository.GetPackageWithoutCardsById(packageId);
