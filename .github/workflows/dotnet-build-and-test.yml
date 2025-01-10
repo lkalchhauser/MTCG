@@ -37,7 +37,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: published-project
+          name: MTCG.Server-win-x64
           path: publish/
 
       # Run tests
