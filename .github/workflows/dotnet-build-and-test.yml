@@ -32,23 +32,27 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release --no-restore
 
-      # Archive built project
-      - name: Archive built project
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: built-project
-          path: |
-            **/bin/Release/**
-
-      # Run tests
+      # Run tests and output results
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        id: run-tests
+        run: dotnet test --no-build --logger "trx;LogFileName=test_results.trx" --verbosity normal
 
       # Publish test results
       - name: Publish test results
-        if: always()
+        if: always()  # Always upload results even if tests fail
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: test_results.trx
+
+      # Output test summary
+      - name: Report test results
+        if: always()
+        run: |
+          passed=$(grep -oP '(?<=<UnitTestResult outcome="Passed").*' test_results.trx | wc -l)
+          failed=$(grep -oP '(?<=<UnitTestResult outcome="Failed").*' test_results.trx | wc -l)
+          skipped=$(grep -oP '(?<=<UnitTestResult outcome="NotExecuted").*' test_results.trx | wc -l)
+          echo "Total Passed: $passed"
+          echo "Total Failed: $failed"
+          echo "Total Skipped: $skipped"
+        shell: bash
