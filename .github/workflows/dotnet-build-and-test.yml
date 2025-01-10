@@ -38,7 +38,7 @@ jobs:
         with:
           name: built-project
           path: |
-            **/bin/Release/**
+            MTCG.Server/bin/Release/**/*
 
       # Run tests
       - name: Run tests
