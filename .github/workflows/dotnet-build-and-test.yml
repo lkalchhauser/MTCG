@@ -35,7 +35,7 @@ jobs:
       # Run tests and output results
       - name: Run tests
         id: run-tests
-        run: dotnet test --no-build --logger "trx;LogFileName=test_results.trx" --verbosity normal
+        run: dotnet test MTCG.Tests/MTCG.Tests.csproj --configuration Debug --no-build --logger "trx;LogFileName=test_results.trx" --verbosity normal
 
       # Publish test results
       - name: Publish test results
