@@ -32,6 +32,20 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Debug --no-restore
 
+      - name: Archive built project
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-project
+          path: |
+            **/bin/Release/**
+
+      - name: Upload linux-x64 not self contained artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-project-x64-${{ env.GIT_ARTIFACT_VERSION }}
+          path: built-project
+
       # Run tests
       - name: Run tests
         run: dotnet test MTCG.Tests/MTCG.Tests.csproj --configuration Debug --no-build --verbosity detailed
