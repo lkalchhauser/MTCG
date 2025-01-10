@@ -1,0 +1,1 @@
+Proper multi threading with db - refactor it so each function gets itself a connection and opens it itself

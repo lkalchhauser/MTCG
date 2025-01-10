@@ -69,7 +69,7 @@ public class Server
 		_logger.Debug("Configuring Services...");
 		services.AddScoped<DatabaseConnection>(provider =>
 			new DatabaseConnection(
-				$"Host={DatabaseCredentials.DB_HOST};Port={DatabaseCredentials.DB_PORT};Username={DatabaseCredentials.DB_USER};Password={DatabaseCredentials.DB_PASSWORD};Database={DatabaseCredentials.DB_NAME};Pooling=True"));
+				$"Host={DatabaseCredentials.DbHost};Port={DatabaseCredentials.DbPort};Username={DatabaseCredentials.DbUser};Password={DatabaseCredentials.DbPassword};Database={DatabaseCredentials.DbName};Pooling=True"));
 
 		_logger.Debug("Configuring Repositories...");
 		services.AddScoped<ICardRepository, CardRepository>();
