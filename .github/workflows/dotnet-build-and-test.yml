@@ -42,4 +42,4 @@ jobs:
 
       # Run tests
       - name: Run tests
-        run: dotnet test MTCG.Tests/MTCG.Tests.csproj --configuration Debug --no-build --verbosity detailed
+        run: dotnet test MTCG.Tests/MTCG.Tests.csproj --configuration Release --no-build --verbosity detailed
