@@ -9,7 +9,7 @@ public class DbUtil
 	public void SetupDatabase()
 	{
 		_logger.Debug("Setting up Database...");
-		var connection = new NpgsqlConnection(new DatabaseCredentials().GetConnectionString());
+		var connection = new NpgsqlConnection(DatabaseCredentials.GetConnectionString());
 		connection.Open();
 
 		// User table

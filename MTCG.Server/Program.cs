@@ -8,8 +8,8 @@ namespace MTCG.Server
 
 		public static void Main(string[] args)
 		{
-			var dbUtil = new DbUtil();
-			dbUtil.SetupDatabase();
+			//var dbUtil = new DbUtil();
+			//dbUtil.SetupDatabase();
 			var server = new HTTP.Server("http://localhost:10001");
 			server.Start();
 		}
