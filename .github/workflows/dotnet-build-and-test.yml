@@ -30,7 +30,7 @@ jobs:
 
       # Publish the project as executable
       - name: Publish project
-        run: dotnet publish --configuration Release --output publish
+        run: dotnet publish MTCG.Server/MTCG.Server.csproj --configuration Release --output publish
 
       # Archive published project
       - name: Archive published project
