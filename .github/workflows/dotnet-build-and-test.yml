@@ -30,7 +30,7 @@ jobs:
 
       # Build the project
       - name: Build project
-        run: dotnet build --configuration Debug --no-restore
+        run: dotnet build --configuration Release --no-restore
 
       - name: Archive built project
         if: success()
@@ -39,12 +39,6 @@ jobs:
           name: built-project
           path: |
             **/bin/Release/**
-
-      - name: Upload linux-x64 not self contained artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-project-x64-${{ env.GIT_ARTIFACT_VERSION }}
-          path: built-project
 
       # Run tests
       - name: Run tests
