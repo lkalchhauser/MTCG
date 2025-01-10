@@ -30,8 +30,8 @@ jobs:
 
       # Build the project
       - name: Build project
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Debug --no-restore
 
       # Run tests
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test MTCG.Tests/MTCG.Tests.csproj --configuration Debug --no-build --verbosity detailed
